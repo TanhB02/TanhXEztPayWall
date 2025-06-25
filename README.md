@@ -1,12 +1,22 @@
-# EztPayWall Library
+# EztPayWall Library - TanhX
 
-## Contents
+## 📚 Contents
 
-* [Install](#install)
-* [Setup Lib](#setup-remote)
-    * [Firebase] (Remote Config)
-    * [CMS] (PayWall)
-    
+- 🚀 [Install](#install)
+- ⚙️ [Setup Library](#setup-purchase--paywall)
+- 🔥 [Firebase Remote Config](#setup-remote-config-firebase)
+- 🧾 [Product Config Details](#-chi-tiết-cấu-hình-các-trường)
+- 🖼️ [CMS (BE) - PayWall Setup](#cms---be-paywall-demo)
+- 🛠️ [API Reference](#api-reference---purchaseutils-functions)
+  - 🔧 [Core Functions](#-core-functions)
+  - 💰 [Purchase Functions](#-purchase-functions)
+  - 🎨 [UI Functions](#-ui-functions)
+  - 💲 [Price & Product Info Functions](#-price--product-info-functions)
+  - 🛠️ [Configuration Functions](#-configuration-functions)
+  - 📊 [PayWall & Template Functions](#-paywall--template-functions)
+- 📦 [PremiumHelper – Sử dụng nhanh](#-premiumhelper--ví-dụ-sử-dụng)
+
+
 ## Install
 
 ## Trong settings.gradle.kts hoặc settings.gradle
@@ -56,6 +66,11 @@ class App : EztApplication() {
     companion object {
         var instance: App? = null
     }
+    
+    
+    override fun getHMACSecretKey(): String {
+        TODO("serect key JWT") 
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -83,19 +98,15 @@ class App : EztApplication() {
         )
     }
 }
-
 ```
 
 ## Setup Remote Config Firebase
 
 ### Remote config on Firebase (Product ID)
 
-Parameter name (key): config_iap 
-
-Data type: Json
-
+Parameter name (key): config_iap  
+Data type: Json  
 Mẫu value:
-
 ```
 {
   "subscriptions": [
@@ -116,6 +127,7 @@ Mẫu value:
   "free_trial": "sub-yearly-free-trial"
 }
 ```
+
 ## 📋 Chi tiết cấu hình các trường
 
 ### Bảng mô tả chi tiết
@@ -130,16 +142,116 @@ Mẫu value:
 
 ---
 
-### CMS - BE (PayWall) ----- Liên hệ BE để rõ logic 
+### CMS - BE (PayWall) Demo  
 Setup Store và Key phải trùng với packagename của project
 
-![Alt text](https://private-user-images.githubusercontent.com/165024827/458826192-a05fad14-0839-4226-a0f9-2a3b07e4e6dd.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTA4NDczMTAsIm5iZiI6MTc1MDg0NzAxMCwicGF0aCI6Ii8xNjUwMjQ4MjcvNDU4ODI2MTkyLWEwNWZhZDE0LTA4MzktNDIyNi1hMGY5LTJhM2IwN2U0ZTZkZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjI1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYyNVQxMDIzMzBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0wODJjNGVhNTJkYzVhYmI0NDE4NGQzMjgzMThmMWVjMTVmNzM5Yzc5MjYxMWE2YmE3OGJjYzY4ZjU1NDkwOTRiJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.UdK2t6HHjsdNpEhO9is5jVPcVn7NZ91B20Iv6zkOMAE)
-
+![Alt text](https://i.postimg.cc/YS7NLjj4/firebase.png)
 
 Setup Template để call api lấy PayWall
 
-![Alt text](https://private-user-images.githubusercontent.com/165024827/458828048-664557a6-57b4-47c6-8c11-a20bedda4ae2.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTA4NDc2MTgsIm5iZiI6MTc1MDg0NzMxOCwicGF0aCI6Ii8xNjUwMjQ4MjcvNDU4ODI4MDQ4LTY2NDU1N2E2LTU3YjQtNDdjNi04YzExLWEyMGJlZGRhNGFlMi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNjI1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDYyNVQxMDI4MzhaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02OWNmNmQ0YzljYzk5MzZjYzhmYTZhNDc2MmIxNDc0ODc0ODg5ZTNhZTAwMTE1MmMzYjAwNDI4ZjA3NzNmOTA1JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.4ZFf8t2u5oxBrhbKq4yiLx16bvboSk5y1ubVShzkSIg)
+![Alt text](https://i.postimg.cc/YCYfSQ2K/template.png)
 
+---
 
+## 📚 API Reference - PurchaseUtils Functions
 
+### 🔧 Core Functions
+
+| Function | Mô tả | Return |
+|----------|-------|--------|
+| `init()` | Khởi tạo billing service | `Unit` |
+| `addInitBillingFinishListener()` | Lắng nghe khi billing khởi tạo xong | `Unit` |
+
+### 💰 Purchase Functions
+
+| Function | Mô tả | Return |
+|----------|-------|--------|
+| `buy()` | Thực hiện mua hàng | `Unit` |
+| `isRemoveAds()` | Kiểm tra user đã mua gói remove ads chưa | `Boolean` |
+| `checkPurchased()` | Kiểm tra user đã mua sản phẩm nào chưa | `Boolean` |
+| `setActionPurchase()` | Thực hiện action dựa trên trạng thái premium | `Unit` |
+
+### 🎨 UI Functions
+
+| Function | Mô tả | Return |
+|----------|-------|--------|
+| `showDialogPayWall()` | Hiển thị PayWall dạng Dialog | `Unit` |
+| `showBottomSheetPayWall()` | Hiển thị PayWall dạng Bottom Sheet | `Unit` |
+| `startActivityIAP()` | Mở PayWall Activity | `Unit` |
+
+### 💲 Price & Product Info Functions
+
+| Function | Mô tả | Return |
+|----------|-------|--------|
+| `getPrice()` | Lấy giá sản phẩm (có currency) | `String` |
+| `getPriceWithoutCurrency()` | Lấy giá sản phẩm (không có currency) | `Float` |
+| `getCurrency()` | Lấy đơn vị tiền tệ | `String` |
+| `getDiscountPrice()` | Lấy giá khuyến mãi | `String` |
+
+### 🛠️ Configuration Functions
+
+| Function | Mô tả | Return |
+|----------|-------|--------|
+| `setCountryCode()` | Set mã quốc gia | `Unit` |
+| `setDarkMode()` | Set dark mode | `Unit` |
+| `checkFreeTrial()` | Kiểm tra free trial | `Boolean` |
+
+### 📊 PayWall & Template Functions
+
+| Function | Mô tả | Return |
+|----------|-------|--------|
+| `getPayWall()` | Lấy URL PayWall từ CMS | `String` |
+| `getPayload()` | Lấy payload JSON cho PayWall | `String` |
+
+## 📦 PremiumHelper – Ví dụ sử dụng
+
+### ✅ Hiển thị Dialog PayWall
+
+Sử dụng `PremiumHelper.showDialogPayWall()` để hiện dialog IAP với URL từ CMS:
+
+```kotlin
+PremiumHelper.showDialogPayWall(
+    context = this,
+    lifecycleCoroutineScope = lifecycleScope,
+    screenName = "main_paywall", // key lấy từ CMS template
+    onFailure = {}
+)
+```
+
+---
+
+### ✅ Hiển thị Bottom Sheet PayWall
+
+Sử dụng `PremiumHelper.showBottomSheetPayWall()` để hiển thị PayWall dạng Bottom Sheet:
+
+```kotlin
+PremiumHelper.showBottomSheetPayWall(
+    activity = this,
+    lifecycleCoroutineScope = lifecycleScope,
+    screenName = "main_paywall", // key lấy từ CMS template
+    onFailure = { },
+    watchAdsCallBack = {}
+)
+```
+
+---
+
+### ✅ Mở PayWall dạng Activity
+
+Sử dụng `PremiumHelper.startIAP()` để mở PayWall dưới dạng activity:
+
+```kotlin
+PremiumHelper.startIAP(
+    activity = this,
+    lifecycleCoroutineScope = lifecycleScope,
+    screenName = "main_paywall", // key lấy từ CMS template
+    onReceivedError = {}
+)
+```
+
+---
+
+### 🔍 Gợi ý khi sử dụng:
+- `screenName` là **key config CMS** mà backend định nghĩa cho từng màn.
+- `onFailure` dùng khi URL trống hoặc web trả lỗi→ nên fallback show ui native
 
