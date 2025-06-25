@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="iv_collapse" type="id"/>
+    <item name="tv_time_countdown" type="id"/>
+    <item name="iv_close_ad" type="id"/>
+    <item name="iv_blur" type="id"/>
+    <item name="fr_blur" type="id"/>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="continue_">Continue</string>
+    <string name="privacy">Privacy Policy</string>
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="restore">Restore</string>
+    <string name="high_speed">High speed experience</string>
+    <string name="all_server_locations">All server locations</string>
+    <string name="no_comitent">No Comitment. Cancel Anytime!</string>
+    <string name="seven_day_free_trial">7-day free trial then <font color='#314BCC'>%1$s/Year</font>. Cancel Anytime!</string>
+    <string name="just_month">Just %1$s/month</string>
+    <string name="title_iap">Enjoy Ad-Free, High-Speed\nVPN Experience</string>
+    <string name="remove_ads">Remove ads</string>
+    <string name="one_month">1 Month</string>
+    <string name="six_months">6 Months</string>
+    <string name="one_year">Year</string>
+    <string name="save_20">Save 20%</string>
+    <string name="day_free_trial">7-day free trial</string>
+    <string name="start_7_day_free_trial">Start 7 Days Free Trial</string>
+    <string name="enjoy_ad_free">Enjoy Ad-Free, High-Speed \n VPN Experience</string>
+</resources>

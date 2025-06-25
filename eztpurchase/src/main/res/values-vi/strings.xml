@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="continue_">Tiếp tục</string>
+    <string name="privacy">Chính sách bảo mật</string>
+    <string name="terms_of_use">Điều khoản sử dụng</string>
+    <string name="restore">Khôi phục</string>
+    <string name="high_speed">Trải nghiệm tốc độ cao</string>
+    <string name="all_server_locations">Tất cả vị trí máy chủ</string>
+    <string name="no_comitent">Không cam kết. Hủy bất cứ lúc nào!</string>
+    <string name="seven_day_free_trial">Dùng thử 7 ngày miễn phí, sau đó <font color='#314BCC'>%1$s/Năm</font>. Hủy bất cứ lúc nào!</string>
+    <string name="just_month">Chỉ %1$s/tháng</string>
+    <string name="title_iap">Tận hưởng VPN không quảng cáo và tốc độ cao</string>
+    <string name="remove_ads">Xóa quảng cáo</string>
+    <string name="one_month">1 Tháng</string>
+    <string name="six_months">6 Tháng</string>
+    <string name="one_year">Năm</string>
+    <string name="save_20">Tiết kiệm 20%</string>
+    <string name="day_free_trial">Dùng thử miễn phí 7 ngày</string>
+    <string name="start_7_day_free_trial">Bắt đầu dùng thử miễn phí 7 ngày</string>
+    <string name="enjoy_ad_free">Tận hưởng VPN không quảng cáo và tốc độ cao</string>
+</resources>

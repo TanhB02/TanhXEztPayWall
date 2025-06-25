@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="continue_">Continuar</string>
+    <string name="privacy">Política de Privacidade</string>
+    <string name="terms_of_use">Termos de Uso</string>
+    <string name="restore">Restaurar</string>
+    <string name="high_speed">Experiência de alta velocidade</string>
+    <string name="all_server_locations">Todas as localizações de servidor</string>
+    <string name="no_comitent">Sem compromisso. Cancele a qualquer momento!</string>
+    <string name="seven_day_free_trial">Teste gratuito de 7 dias, depois <font color='#314BCC'>%1$s/Ano</font>. Cancele a qualquer momento!</string>
+    <string name="just_month">Apenas %1$s/mês</string>
+    <string name="title_iap">Desfrute de VPN sem anúncios e alta velocidade</string>
+    <string name="remove_ads">Remover anúncios</string>
+    <string name="one_month">1 Mês</string>
+    <string name="six_months">6 Meses</string>
+    <string name="one_year">Ano</string>
+    <string name="save_20">Economize 20%</string>
+    <string name="day_free_trial">Teste gratuito de 7 dias</string>
+    <string name="start_7_day_free_trial">Começar teste gratuito de 7 dias</string>
+    <string name="enjoy_ad_free">Desfrute de VPN sem anúncios e alta velocidade</string>
+
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><!-- START xml_defaults -->
+<defaultsMap>
+
+    <entry>
+        <key>time_hold_iap</key>
+        <value>5</value>
+    </entry>
+
+    <entry>
+        <key>native_language_new</key>
+        <value>true</value>
+    </entry>
+</defaultsMap>

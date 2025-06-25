@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="continue_">जारी रखें</string>
+    <string name="privacy">गोपनीयता नीति</string>
+    <string name="terms_of_use">उपयोग की शर्तें</string>
+    <string name="restore">पुनर्स्थापित करें</string>
+    <string name="high_speed">उच्च गति अनुभव</string>
+    <string name="all_server_locations">सभी सर्वर स्थान</string>
+    <string name="no_comitent">कोई प्रतिबद्धता नहीं। कभी भी रद्द करें!</string>
+    <string name="seven_day_free_trial">7‑दिन मुफ़्त ट्रायल फिर <font color='#314BCC'>%1$s/वर्ष</font>. कभी भी रद्द करें!</string>
+    <string name="just_month">केवल %1$s/माह</string>
+    <string name="title_iap">विज्ञापन-रहित, उच्च गति VPN अनुभव का आनंद लें</string>
+    <string name="remove_ads">विज्ञापन हटाएं</string>
+    <string name="one_month">1 महीना</string>
+    <string name="six_months">6 महीने</string>
+    <string name="one_year">साल</string>
+    <string name="save_20">20% बचाएँ</string>
+    <string name="day_free_trial">7‑दिन मुफ़्त ट्रायल</string>
+    <string name="start_7_day_free_trial">7‑दिन मुफ़्त ट्रायल शुरू करें</string>
+    <string name="enjoy_ad_free">विज्ञापन-रहित, उच्च गति VPN अनुभव का आनंद लें</string>
+
+</resources>

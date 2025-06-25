@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="continue_">متابعة</string>
+    <string name="privacy">سياسة الخصوصية</string>
+    <string name="terms_of_use">شروط الاستخدام</string>
+    <string name="restore">استعادة</string>
+    <string name="high_speed">تجربة عالية السرعة</string>
+    <string name="all_server_locations">جميع مواقع الخوادم</string>
+    <string name="no_comitent">بدون التزام. يمكنك الإلغاء في أي وقت!</string>
+    <string name="seven_day_free_trial">تجربة مجانية لمدة 7 أيام ثم <font color='#314BCC'>%1$s/سنة</font>. يمكنك الإلغاء في أي وقت!</string>
+    <string name="just_month">فقط %1$s/شهر</string>
+    <string name="title_iap">استمتع بتجربة VPN بدون إعلانات وعالية السرعة</string>
+    <string name="remove_ads">إزالة الإعلانات</string>
+    <string name="one_month">شهر واحد</string>
+    <string name="six_months">6 أشهر</string>
+    <string name="one_year">سنة</string>
+    <string name="save_20">وفر 20٪</string>
+    <string name="day_free_trial">تجربة مجانية لمدة 7 أيام</string>
+    <string name="start_7_day_free_trial">ابدأ تجربة مجانية لمدة 7 أيام</string>
+    <string name="enjoy_ad_free">استمتع بتجربة VPN بدون إعلانات وعالية السرعة</string>
+</resources>

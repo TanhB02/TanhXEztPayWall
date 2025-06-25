@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <!--Loading-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ctLoadding"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieAnimation0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/anim_map" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieAnimation1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/fbase_dimen_300"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/anim_loading" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--WebView-->
+    <FrameLayout
+        android:id="@+id/webViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+
+    <!--Backup Native-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ctBackUp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_iap"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fbase_dimen_12"
+            android:fitsSystemWindows="true"
+            android:padding="@dimen/fbase_dimen_4"
+            android:src="@drawable/ic_close_iap"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/lnBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fbase_dimen_24"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPrivacyPolicy"
+                style="@style/TextRegular_12sp"
+                android:padding="@dimen/fbase_dimen_2"
+                android:text="@string/privacy" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextRegular_12sp"
+                android:paddingHorizontal="@dimen/fbase_dimen_4"
+                android:text="|" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTermsOfUse"
+                style="@style/TextRegular_12sp"
+                android:padding="@dimen/fbase_dimen_2"
+                android:text="@string/terms_of_use" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextRegular_12sp"
+                android:paddingHorizontal="@dimen/fbase_dimen_4"
+                android:text="|" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRestore"
+                style="@style/TextRegular_12sp"
+                android:padding="@dimen/fbase_dimen_2"
+                android:text="@string/restore" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clContinue"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fbase_dimen_60"
+            android:layout_marginHorizontal="@dimen/fbase_dimen_16"
+            android:layout_marginTop="@dimen/fbase_dimen_8"
+            android:layout_marginBottom="@dimen/fbase_dimen_16"
+            android:background="@drawable/bg_continue_iap"
+            app:layout_constraintBottom_toTopOf="@+id/lnBottom">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/ctl1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                app:cardBackgroundColor="@color/transparent"
+                app:cardCornerRadius="@dimen/fbase_dimen_16"
+                app:cardElevation="0dp"
+                app:cardPreventCornerOverlap="false"
+                app:cardUseCompatPadding="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/shine"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/bg_shine"
+                    android:outlineProvider="background"
+                    android:scaleType="fitCenter"
+                    app:shapeAppearance="@style/ImageRoundedCorner16dp" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvContinue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="@string/continue_"
+                android:textColor="@color/color_FDFDFD"
+                android:textSize="@dimen/fbase_text_size_16"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTitlePackage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fbase_dimen_8"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/no_comitent"
+            android:textAlignment="center"
+            android:textColor="@color/color_7B809E"
+            android:textSize="@dimen/fbase_text_size_10"
+            app:layout_constraintBottom_toTopOf="@+id/clContinue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llPrices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/fbase_dimen_16"
+            android:layout_marginBottom="@dimen/fbase_corner_32"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/tvTitlePackage">
+
+            <com.tanhxpurchase.customview.ItemIAPView
+                android:id="@+id/view1Month"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isSelect="false"
+                app:price="sub-1monthly" />
+
+            <com.tanhxpurchase.customview.ItemIAPView
+                android:id="@+id/view6Month"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isSelect="false"
+                app:price="sub-6monthly" />
+
+            <com.tanhxpurchase.customview.ItemIAPView
+                android:id="@+id/viewYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/fbase_dimen_4"
+                app:isSelect="true"
+                app:price="sub-yearly" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvHighSpeed"
+            style="@style/TextMedium_12sp"
+            android:layout_marginStart="@dimen/fbase_dimen_34"
+            android:layout_marginBottom="@dimen/fbase_dimen_16"
+            android:drawableStart="@drawable/ic_hight_speed"
+            android:drawablePadding="@dimen/fbase_dimen_8"
+            android:gravity="center"
+            android:text="@string/high_speed"
+            android:textSize="@dimen/fbase_text_size_14"
+
+            app:layout_constraintBottom_toTopOf="@+id/llPrices"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAllSever"
+            style="@style/TextMedium_12sp"
+            android:layout_marginStart="@dimen/fbase_dimen_34"
+            android:layout_marginBottom="@dimen/fbase_dimen_16"
+            android:drawableStart="@drawable/ic_all_sever_location"
+            android:drawablePadding="@dimen/fbase_dimen_8"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:text="@string/all_server_locations"
+            android:textSize="@dimen/fbase_text_size_14"
+            app:layout_constraintBottom_toTopOf="@+id/tvHighSpeed"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRemoveAds"
+            style="@style/TextMedium_12sp"
+            android:layout_marginStart="@dimen/fbase_dimen_34"
+            android:layout_marginBottom="@dimen/fbase_dimen_16"
+            android:drawableStart="@drawable/ic_no_ads"
+            android:drawablePadding="@dimen/fbase_dimen_8"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:text="@string/remove_ads"
+            android:textSize="@dimen/fbase_text_size_14"
+            app:layout_constraintBottom_toTopOf="@+id/tvAllSever"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEnjoyAdFree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fbase_dimen_16"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:text="@string/enjoy_ad_free"
+            android:textAlignment="center"
+            android:textColor="@color/color_121212"
+            android:textSize="@dimen/fbase_text_size_24"
+            app:layout_constraintBottom_toTopOf="@+id/tvRemoveAds"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fbase_dimen_8"
+            android:fitsSystemWindows="true"
+            android:src="@drawable/ic_protected_blur"
+            app:layout_constraintBottom_toTopOf="@+id/tvEnjoyAdFree"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

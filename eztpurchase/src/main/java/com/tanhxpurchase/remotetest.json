@@ -1,0 +1,18 @@
+{
+  "subscriptions": [
+    "sub_yearly",
+    "sub_1monthly",
+    "sub_6monthly"
+  ],
+  "one_time_products": [
+    "sub_lifetime"
+  ],
+  "consumable_products": [],
+  "remove_ads": [
+    "sub_yearly",
+    "sub_1monthly",
+    "sub_6monthly",
+    "sub_lifetime"
+  ],
+  "free_trial": "sub-yearly-free-trial"
+}

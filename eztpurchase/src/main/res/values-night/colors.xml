@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAds">#068abf</color>
+    <color name="colorAdsButton">#2471ff</color>
+    <color name="color_main">#068abf</color>
+
+
+    <color name="blueDark">#062737</color>
+    <color name="white">#ffffffff</color>
+    <color name="yellow">#eed202 </color>
+    <color name="black">#000000</color>
+    <color name="blue">#4f4bf7</color>
+
+    <color name="text_des">#B0B0B0</color>
+
+    <color name="rating_title">#415368</color>
+    <color name="rating_button">#ff5582</color>
+    <color name="rating_desc">#cccccc</color>
+    <color name="rating_star">#fed555</color>
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="lightTransparent">#16000000</color>
+
+    <color name="ads_btn_background_tint">#2471ff</color>
+    <color name="ads_btn_text_color">#ffffffff</color>
+    <color name="ads_btn_ripple_color">#ffffffff</color>
+
+    <color name="ads_text_color">@color/black</color>
+    <color name="ads_border_color">#C4CDE0</color>
+
+    <color name="survey_main_color">#5D9EFF</color>
+    <color name="survey_secondary_color">#385D9EFF</color>
+
+    <color name="shimmer_base_color">@color/white</color>
+    <color name="shimmer_highlight_color">@color/white</color>
+    <color name="color_20222C">#FDFDFD</color>
+    <color name="color_7B809E">#7B809E</color>
+    <color name="color_FDFDFD">#20222C</color>
+    <color name="strok_close">#7B809E</color>
+    <color name="bg_close">#36394A</color>
+    <color name="color_121212">#FDFDFD</color>
+    <color name="color_EAEDFA">#36394A</color>
+    <color name="color_D2D4DE">#4C5067</color>
+    <color name="box_inner_background">#4C5067</color>
+    <color name="color_314BCC">#5B6FD7</color>
+    <color name="bg_color_main_iap">#20222C</color>
+</resources>

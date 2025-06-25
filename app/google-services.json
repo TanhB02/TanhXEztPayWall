@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "51877797595",
+    "project_id": "vpn-2-a2e6f",
+    "storage_bucket": "vpn-2-a2e6f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51877797595:android:cc83477019a313607a36fe",
+        "android_client_info": {
+          "package_name": "com.ezt.vpn2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDP4aN3y1fQsiT1egnHgHoUzZvZgRIos5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

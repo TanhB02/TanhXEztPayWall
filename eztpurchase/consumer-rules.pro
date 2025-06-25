@@ -1,0 +1,2 @@
+-keep class com.publisher.ads.** { *; }
+-keep class com.facebook.ads.** { *; }
