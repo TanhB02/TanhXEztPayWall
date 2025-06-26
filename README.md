@@ -19,7 +19,7 @@
 
 ## Install
 
-## Trong settings.gradle.kts hoặc settings.gradle
+## Trong settings.gradle.kts hoặc build.gradle cấp project
 
 ```
 dependencyResolutionManagement {
@@ -40,21 +40,18 @@ dependencyResolutionManagement {
 }
 ```
 
-### gradle.properties
+### gradle.properties --- 
 
 ```
-android.useAndroidX=true
-android.enableJetifier=true
-
 gpr.user=TanhB02
-gpr.token=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
+gpr.token=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
 ```
 
 ### build.gradle(Module:app)
 
 ```
 dependencies {
-	implementation ("TanhB02:eztpaywall:1.0.0-beta")
+	implementation ("TanhB02:eztpaywall:Recent versions")
 }
 ```
 
@@ -66,20 +63,13 @@ class App : EztApplication() {
     companion object {
         var instance: App? = null
     }
-    
-    
-    override fun getHMACSecretKey(): String {
-        TODO("serect key JWT") 
-    }
 
     override fun onCreate() {
         super.onCreate()
         //TODO Gán biến check đã premium hay chưa để check load ads dùng PurchaseUtils.isRemoveAds()
     }
     
-    /**
-     * TanhX - Setup local product config
-     */
+    //TODO  TanhX - Setup local product config
     override fun getDefaultProductConfig(): RemoteProductConfig {
         return RemoteProductConfig(
             subscriptions = listOf(
@@ -147,7 +137,7 @@ Setup Store và Key phải trùng với packagename của project
 
 ![Alt text](https://i.postimg.cc/YS7NLjj4/firebase.png)
 
-Setup Template để call api lấy PayWall
+Setup Template để call api lấy PayWall - Dưới native sẽ show PayWall với URL tương ứng được set
 
 ![Alt text](https://i.postimg.cc/YCYfSQ2K/template.png)
 
@@ -254,4 +244,10 @@ PremiumHelper.startIAP(
 ### 🔍 Gợi ý khi sử dụng:
 - `screenName` là **key config CMS** mà backend định nghĩa cho từng màn.
 - `onFailure` dùng khi URL trống hoặc web trả lỗi→ nên fallback show ui native
+- `onReceivedError ` là callback khi paywall lỗi, timeout, chưa setup url trên Cms, Api lỗi
+- `EZT_Purchase` tag liên quan đến Purchase, Paywall, Cms, Api, ...
+- `onUpgradeNow` là callback khi user click để sang màn IAP (giành cho bottomsheet, dialog)
+- `watchAdsCallBack` là callback khi user chấp nhận xem ads thay vì mua IAP (Dialog, BottomSheet)
+- `onPurchaseSuccess` callback khi user mua thành công với PayWall (IAP)
+- `onCloseClicked` callback khi user đóng màn PayWall (IAP)
 
