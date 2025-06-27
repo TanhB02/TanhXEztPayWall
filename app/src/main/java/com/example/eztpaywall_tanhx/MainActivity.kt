@@ -32,7 +32,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun addEvent() {
         binding.tvIAP.setOnClickListener {
-            startIAP(this@MainActivity, lifecycleScope)
+            startIAP(this@MainActivity, lifecycleScope, onReceivedError = {})
         }
 
         binding.tvBTS.setOnClickListener {

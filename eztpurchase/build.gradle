@@ -27,14 +27,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
 
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "11"
     }
     lintOptions {
         abortOnError false
@@ -57,23 +57,19 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                // Cấu hình artifact Maven
-                groupId = 'com.github.tanhb02'
-                artifactId = 'sdk_ads_tanhx' // Tên artifact của thư viện
-                version = '1.0.8'
+                groupId = 'TanhB02'
+                artifactId = 'eztpaywall'
+                version = '1.0.0-beta1'
 
                 afterEvaluate {
                     from components.release
                 }
-
-
-//                from components.release
             }
         }
         repositories {
             maven {
-                name = "TanhB02" // Tên repository trong cấu hình publish
-                url = uri("https://maven.pkg.github.com/TanhB02/TanhX_Lib_IAA_IAP")
+                name = "TanhB02"
+                url = uri("https://maven.pkg.github.com/TanhB02/TanhXEztPayWall")
 
                 credentials {
                     username = System.getenv("GITHUB_ACTOR") ?: project.properties["gpr.user"] as String
@@ -87,7 +83,7 @@ afterEvaluate {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "11"
     }
 }
 
@@ -128,8 +124,8 @@ dependencies {
     kapt "com.squareup.moshi:moshi-kotlin-codegen:1.13.0"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
 
-    implementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
-    implementation 'androidx.test.espresso:espresso-contrib:3.3.0'
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.6.1'
+    implementation 'androidx.test.espresso:espresso-contrib:3.6.1'
 
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 

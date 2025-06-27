@@ -62,4 +62,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "TanhX_Lib_IAA_IAP"
-include(":app", ":eztPurchase")
+include(":app", ":eztpurchase")
