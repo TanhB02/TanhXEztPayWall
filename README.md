@@ -44,7 +44,7 @@ dependencyResolutionManagement {
 
 ```
 gpr.user=TanhB02
-gpr.token=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
+gpr.token= github k cho push key public ----- CHECK TOKEN ĐƯỢC CẤP 
 ```
 
 ### build.gradle(Module:app)
