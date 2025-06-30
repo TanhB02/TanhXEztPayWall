@@ -18,6 +18,7 @@ import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.util.configureWebViewSettings
 import com.tanhxpurchase.util.logD
+import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.toGone
@@ -72,15 +73,31 @@ class PremiumBottomSheet :
     private fun TimeOutWithNoPrice(){
         jobTimeOut = lifecycleScope.launch {
             delay(TimeOut_PayWall_No_Price)
-            onFailureCallback?.invoke()
+            if (isVisible && !isDetached) {
+                onFailureCallback?.invoke()
+            }
             jobTimeOut?.cancel()
         }
     }
 
     override fun initView() {
+        if (url.isBlank()) {
+            onFailureCallback?.invoke()
+            dismiss()
+            return
+        }
         setupWebView()
         logD("TANHXXXX =>>>>> url:${url}")
-        currentWebView?.loadUrl(url)
+        try {
+            currentWebView?.loadUrl(url)
+        } catch (e: Exception) {
+            if (isVisible && !isDetached) {
+                onFailureCallback?.invoke()
+                dismiss()
+            }
+            return
+        }
+        
         TimeOutWithNoPrice()
     }
 
@@ -92,13 +109,19 @@ class PremiumBottomSheet :
         currentWebView = createWebView()
             .apply {
                 setupWebViewClientWithTimeout(lifecycleScope, onPageFinished = { webView, url ->
-                    injectionScript?.let {
-                        evaluateJavascript(it, null)
+                    try {
+                        if (injectionScript != null && isVisible && !isDetached) {
+                            evaluateJavascript(injectionScript!!, null)
+                        }
+                    } catch (e: Exception) {
+                        logd("TANHXXXX => Error evaluating JavaScript in PremiumBottomSheet: ${e.message}")
                     }
                 }, onReceivedError = {
-                    dismiss()
-                    onFailureCallback?.invoke()
-                    jobTimeOut?.cancel()
+                    if (isVisible && !isDetached) {
+                        onFailureCallback?.invoke()
+                        jobTimeOut?.cancel()
+                        dismiss()
+                    }
                 })
             }
         binding.webViewContainer.addView(currentWebView)
@@ -112,14 +135,18 @@ class PremiumBottomSheet :
                 addJavascriptInterface(IAPWebInterface(this@PremiumBottomSheet), Android)
             }
         } catch (e: Exception) {
-            onFailureCallback?.invoke()
-            jobTimeOut?.cancel()
-            dismiss()
+            logd("TANHXXXX => Error creating WebView in PremiumBottomSheet: ${e.message}")
+            if (isVisible && !isDetached) {
+                onFailureCallback?.invoke()
+                jobTimeOut?.cancel()
+                dismiss()
+            }
             throw e
         }
     }
 
     override fun onUserClickListener(data: String) {
+        if (!isVisible || isDetached) return
         lifecycleScope.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
                 UPGRADE -> {

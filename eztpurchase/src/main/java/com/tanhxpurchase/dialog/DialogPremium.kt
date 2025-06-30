@@ -20,6 +20,7 @@ import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.util.configureWebViewSettings
 import com.tanhxpurchase.util.logD
+import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.toGone
@@ -48,16 +49,32 @@ class DialogPremium(
     private var currentWebView: WebView? = null
     override fun initViews(binding: DialogPremiumBinding) {
         setCancelable(true)
+        if (url.isBlank()) {
+            onFailureCallback()
+            return
+        }
+        
         injectionScript = viewModel.createInjectionScript(context)
         setupWebView()
-        currentWebView?.loadUrl(url)
+        
+        try {
+            currentWebView?.loadUrl(url)
+        } catch (e: Exception) {
+            if (isShowing) {
+                onFailureCallback()
+            }
+            return
+        }
+        
         TimeOutWithNoPrice()
     }
 
     private fun TimeOutWithNoPrice() {
         jobTimeOut = lifecycles.launch {
             delay(TimeOut_PayWall_No_Price)
-            onFailureCallback()
+            if (isShowing) {
+                onFailureCallback()
+            }
         }
     }
 
@@ -69,13 +86,19 @@ class DialogPremium(
         currentWebView = createWebView()
             .apply {
                 setupWebViewClientWithTimeout(lifecycles, onPageFinished = { webView, url ->
-                    injectionScript?.let {
-                        evaluateJavascript(it, null)
+                    try {
+                        if (injectionScript != null && isShowing) {
+                            evaluateJavascript(injectionScript!!, null)
+                        }
+                    } catch (e: Exception) {
+                        logd("TANHXXXX => Error evaluating JavaScript in DialogPremium: ${e.message}")
                     }
                 }, onReceivedError = {
-                    dismiss()
-                    onFailureCallback.invoke()
-                    jobTimeOut?.cancel()
+                    if (isShowing) {
+                        onFailureCallback.invoke()
+                        jobTimeOut?.cancel()
+                        dismiss()
+                    }
                 })
             }
         binding.webViewContainer.addView(currentWebView)
@@ -89,15 +112,19 @@ class DialogPremium(
                 addJavascriptInterface(IAPWebInterface(this@DialogPremium), Android)
             }
         } catch (e: Exception) {
-            onFailureCallback.invoke()
-            jobTimeOut?.cancel()
-            dismiss()
+            logd("TANHXXXX => Error creating WebView in DialogPremium: ${e.message}")
+            if (isShowing) {
+                onFailureCallback.invoke()
+                jobTimeOut?.cancel()
+                dismiss()
+            }
             throw e
         }
     }
 
 
     override fun onUserClickListener(data: String) {
+        if (!isShowing) return
         lifecycles.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
                 UPGRADE -> {
@@ -122,7 +149,6 @@ class DialogPremium(
                 }
             }
         }
-
     }
 
 

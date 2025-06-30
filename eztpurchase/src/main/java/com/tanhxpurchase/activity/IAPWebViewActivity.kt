@@ -30,6 +30,7 @@ import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
 import com.tanhxpurchase.util.clickeffect.setOnClickShrinkEffectListener
 import com.tanhxpurchase.util.configureWebViewSettings
+import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.util.openLink
 import com.tanhxpurchase.util.setTextHtml
 import com.tanhxpurchase.util.setTextRes
@@ -100,17 +101,29 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     private fun TimeOutWithNoPrice() {
         jobTimeOut = lifecycleScope.launch {
             delay(TimeOut_PayWall_No_Price)
-            onReceivedError()
+            if (!isDestroyed && !isFinishing) {
+                onReceivedError()
+            }
         }
     }
 
 
     override fun initView() {
         urlWeb = intent.getStringExtra(URL).toString()
+        if (urlWeb.isBlank() || urlWeb == "null") {
+            onReceivedError()
+            return
+        }
         injectionScript = viewModel.createInjectionScript(this@IAPWebViewActivity)
         setupWebView()
         shineAnimation(binding.shine)
-        currentWebView?.loadUrl(urlWeb)
+        try {
+            currentWebView?.loadUrl(urlWeb)
+        } catch (e: Exception) {
+            onReceivedError()
+            return
+        }
+        
         if (PurchaseUtils.checkFreeTrial()) {
             productIDSelect = Base_Plan_Id_Yearly_Trial
             binding.tvContinue.setTextRes(R.string.start_7_day_free_trial)
@@ -131,8 +144,12 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             currentWebView = createWebView()
                 .apply {
                     setupWebViewClientWithTimeout(lifecycleScope, onPageFinished = { webView, url ->
-                        injectionScript?.let {
-                            evaluateJavascript(it, null)
+                        try {
+                            if (injectionScript != null && !isDestroyed && !isFinishing) {
+                                evaluateJavascript(injectionScript!!, null)
+                            }
+                        } catch (e: Exception) {
+                            logd("TANHXXXX => Error evaluating JavaScript: ${e.message}")
                         }
                     }, onReceivedError = {
                         onReceivedError()
@@ -154,25 +171,26 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     }
 
     private fun onFailureCallbackWithError() {
-        if (!onFailureCallback()) {
-            iapCallback?.onReceivedError()
+        if (isDestroyed || isFinishing) return
+        iapCallback?.onReceivedError()
+        if (onFailureCallback()) {
+            binding.webViewContainer.toGone()
+            binding.ctBackUp.toVisible()
+            binding.ctLoadding.toGone()
+        } else {
             finish()
-            return
         }
     }
 
     private fun onReceivedError() {
         onFailureCallbackWithError()
-        binding.webViewContainer.toGone()
-        binding.ctBackUp.toVisible()
-        binding.ctLoadding.toGone()
-
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun createWebView(): WebView {
         return try {
-            WebView(this).apply {
+            val webView = WebView(this)
+            webView.apply {
                 configureWebViewSettings(this)
                 addJavascriptInterface(IAPWebInterface(this@IAPWebViewActivity), Android)
             }
@@ -186,6 +204,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
 
     // @formatter:off
     override fun onUserClickListener(data: String) {
+        if (isDestroyed || isFinishing) return
         lifecycleScope.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
                 CLOSE -> { handleCloseAction() }
@@ -194,15 +213,15 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
                 RESTORE -> { openLink(Restore) }
                 PAYLOAD_RECEIVED ->{
                     lifecycleScope.launch(Dispatchers.Main) {
-                        jobTimeOut?.cancel()
-                        binding.webViewContainer.toVisible()
-                        binding.ctBackUp.toGone()
-                        binding.ctLoadding.toGone()
+                            jobTimeOut?.cancel()
+                            binding.webViewContainer.toVisible()
+                            binding.ctBackUp.toGone()
+                            binding.ctLoadding.toGone()
                     }
                 }
                 else -> {
                     productIDSelect = data
-                    buyProduct(productIDSelect.toString())
+                    buyProduct(productIDSelect)
                 }
             }
         }
@@ -215,12 +234,15 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     }
 
     private fun buyProduct(producID: String) {
+        if (isDestroyed || isFinishing) return
         PurchaseUtils.buy(
             this,
             producID,
-            onPurchaseSuccess = { purchase ->
-                iapCallback?.onPurchaseSuccess()
-                finish()
+            onPurchaseSuccess = {
+                if (!isDestroyed && !isFinishing) {
+                    iapCallback?.onPurchaseSuccess()
+                    finish()
+                }
             },
             onPurchaseFailure = { code, errorMsg ->
 
@@ -279,13 +301,15 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             }
 
             clContinue.setOnClickShrinkEffectListener {
-                buyProduct(productIDSelect.toString())
+                buyProduct(productIDSelect)
             }
         }
     }
 
     private fun handleCloseAction() {
-        iapCallback?.onCloseClicked()
+        if (!isDestroyed && !isFinishing) {
+            iapCallback?.onCloseClicked()
+        }
         finish()
     }
 
