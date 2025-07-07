@@ -1,5 +1,6 @@
 package com.tanhxpurchase.network
 
+import com.tanhxpurchase.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,8 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object NetworkModule {
     
-    private const val BASE_URL = "https://paywall.eztechglobal.com"
-    
+
     private val httpLoggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -22,8 +22,8 @@ object NetworkModule {
     
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
-            .addInterceptor(curlLoggingInterceptor)
             .addInterceptor(httpLoggingInterceptor)
+            .addNetworkInterceptor(curlLoggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)

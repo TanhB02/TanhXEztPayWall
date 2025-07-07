@@ -30,6 +30,7 @@ import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
 import com.tanhxpurchase.util.clickeffect.setOnClickShrinkEffectListener
 import com.tanhxpurchase.util.configureWebViewSettings
+import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.util.openLink
 import com.tanhxpurchase.util.setTextHtml
@@ -38,7 +39,9 @@ import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.shineAnimation
 import com.tanhxpurchase.util.toGone
 import com.tanhxpurchase.util.toVisible
+import com.tanhxpurchase.worker.DeviceRegistrationManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -207,7 +210,9 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
         if (isDestroyed || isFinishing) return
         lifecycleScope.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
-                CLOSE -> { handleCloseAction() }
+                CLOSE -> {
+                    handleCloseAction()
+                }
                 POLICY -> { openLink(Privacy_Policy) }
                 TERMS -> { openLink(Terms) }
                 RESTORE -> { openLink(Restore) }
@@ -230,6 +235,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
 
     override fun onDestroy() {
         super.onDestroy()
+        logD("TANHXXXX =>>>>> ondestroy ")
         jobTimeOut?.cancel()
     }
 
@@ -309,6 +315,10 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     private fun handleCloseAction() {
         if (!isDestroyed && !isFinishing) {
             iapCallback?.onCloseClicked()
+        }
+        GlobalScope.launch {
+            delay(3000)
+            DeviceRegistrationManager.enqueueDeviceRegistration(applicationContext)
         }
         finish()
     }

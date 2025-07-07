@@ -16,7 +16,7 @@ object PremiumHelper {
         screenName: String = "",
         onFailure: () -> Unit
     ) {
-        var url = getPayWall(packageName = context.packageName, keyConfig = screenName)
+        var url = getPayWall( context.packageName,keyConfig = screenName)
         if (url.isEmpty()) {
             onFailure.invoke()
         }
@@ -46,7 +46,7 @@ object PremiumHelper {
         onFailure: () -> Unit,
         watchAdsCallBack: (() -> Unit)? = null,
     ) {
-        var url = getPayWall(packageName = activity.packageName, keyConfig = screenName)
+        var url = getPayWall(activity.packageName,keyConfig = screenName)
         if (url.isEmpty()) {
             onFailure.invoke()
             return
@@ -83,7 +83,7 @@ object PremiumHelper {
         lifecycleCoroutineScope.launch {
             PurchaseUtils.startActivityIAP(
                 context = activity,
-                urlWeb = getPayWall(packageName = activity.packageName, keyConfig = screenName),
+                urlWeb = getPayWall(activity.packageName,keyConfig = screenName),
                 onPurchaseSuccess = {
 
                 },

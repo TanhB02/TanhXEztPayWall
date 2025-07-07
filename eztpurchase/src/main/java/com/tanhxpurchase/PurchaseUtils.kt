@@ -15,8 +15,7 @@ import com.tanhxpurchase.sharepreference.EzTechPreferences
 import com.tanhxpurchase.sharepreference.EzTechPreferences.countryCode
 import com.tanhxpurchase.sharepreference.EzTechPreferences.isDarkMode
 import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
-import com.tanhxpurchase.util.JwtPayWall
-import com.tanhxpurchase.util.TemplateDataManager.getTemplatesByValue
+import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logFirebaseEvent
 import kotlinx.coroutines.CoroutineScope
@@ -99,14 +98,11 @@ object PurchaseUtils : PurchaseUpdateListener {
         bottomSheet.show(activity.supportFragmentManager, "PremiumBottomSheet")
     }
 
-    fun getPayWall(packageName: String, keyConfig: String): String {
-        val urls = getTemplatesByValue(packageName, keyConfig).joinToString(separator = "\n") {
-            it.url
-        }
-
-        return urls
+    fun getPayWall(packageName : String,keyConfig: String): String {
+        val url = getTemplateUrlByName(packageName,keyConfig)
+        logD("TANHXXXX =>>>>> url:${url}")
+        return url
     }
-
 
 
     fun addInitBillingFinishListener(listener: () -> Unit) {

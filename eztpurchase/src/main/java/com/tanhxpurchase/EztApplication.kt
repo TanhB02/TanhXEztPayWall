@@ -1,7 +1,6 @@
 package com.tanhxpurchase
 
 import android.app.Application
-import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
@@ -11,9 +10,11 @@ import com.tanhxpurchase.model.RemoteProductConfig
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.sharepreference.EzTechPreferences.producFreetrial
 import com.tanhxpurchase.util.ApiResult
-import com.tanhxpurchase.util.JwtPayWall
+import com.tanhxpurchase.util.JwtPayWall.generateTrackingToken
+import com.tanhxpurchase.util.JwtPayWall.jwtToken
 import com.tanhxpurchase.util.TemplateDataManager
 import com.tanhxpurchase.util.logD
+import com.tanhxpurchase.util.logd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,7 +37,7 @@ open class EztApplication : Application() {
         FirebaseApp.initializeApp(this@EztApplication)
         PurchaseUtils.init(this@EztApplication)
         initFirebaseRemoteConfig()
-        JwtPayWall.jwtToken(instance)
+        jwtToken(instance)
         loadTemplateData()
         PurchaseUtils.checkFreeTrial()
     }
@@ -46,32 +47,37 @@ open class EztApplication : Application() {
 
         templateJob = templateScope.launch {
             try {
-
-                templateRepository?.getTemplatesByKeys(listOf(packageName))?.collect { result ->
+                templateRepository?.getTemplatesByPackageId(packageName)?.collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
-                            val templateResponse = result.data.data.find { it.params == packageName }
-                            templateResponse?.let { template ->
-                                TemplateDataManager.saveTemplateData(packageName, template.data)
-                                template.data.forEach { templateData ->
-                                    templateData.templates.forEach {
-                                        Log.d(EZT_Purchase, "observeViewModel: Template URL:${it.url}")
+                            try {
+                                result.data.data?.params?.forEach { param ->
+                                    param.firebaseValues.forEach { firebaseValue ->
+                                        firebaseValue.templates.forEach { template ->
+                                            logd("FirebaseValue: ${firebaseValue.value}, Template: ${template.name}, URL: ${template.url}", DataTemplate)
+                                        }
                                     }
                                 }
-                                cleanupTemplateResources()
+                                result.data.data?.let {
+                                    TemplateDataManager.saveTemplateDataAll(packageName, it)
+                                }
+                            } catch (e: Exception) {
+                                logd("Error processing template data: ${e.message}", DataTemplate)
+
                             }
+                            cleanupTemplateResources()
                         }
                         is ApiResult.Error -> {
-                            logD("TANHXXXX =>>>>> Error loading templates: ${result.message}")
+                            logd("Error loading templates: ${result.message}", DataTemplate)
                             cleanupTemplateResources()
                         }
                         is ApiResult.Loading -> {
-                            logD("TANHXXXX =>>>>> Loading templates...")
+                            logd("Loading templates...", DataTemplate)
                         }
                     }
                 }
             } catch (e: Exception) {
-                logD("TANHXXXX =>>>>> Exception loading templates: ${e.message}")
+                logd("Exception loading templates", DataTemplate)
                 cleanupTemplateResources()
             }
         }

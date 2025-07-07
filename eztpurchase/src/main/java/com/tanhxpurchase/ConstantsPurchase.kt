@@ -1,8 +1,16 @@
 package com.tanhxpurchase
+const val BASE_URL = "https://paywall.eztechglobal.com"
+
+const val AUTHEN_PAYWALL = "AUTHEN_PAYWALL"
+const val AUTHEN_TRACKING = "AUTHEN_TRACKING"
+const val ACCESS_TOKEN = "ACCESS_TOKEN"
 
 const val EZT_Purchase = "EZT_Purchase"
+const val TokenPayWall = "TokenPayWall"
+const val DataTemplate = "DataTemplate"
+const val API = "API"
+
 const val Android = "Android"
-const val AUTHEN_PAYWALL = "AUTHEN_PAYWALL"
 
 // Time out for IAP
 const val TimeOut_PayWall = 5678L

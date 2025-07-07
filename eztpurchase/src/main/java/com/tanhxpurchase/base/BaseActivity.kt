@@ -7,8 +7,13 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.sharepreference.EzTechPreferences
+import com.tanhxpurchase.util.ApiResult
+import com.tanhxpurchase.util.logD
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {

@@ -12,6 +12,7 @@ import com.example.eztpaywall_tanhx.PremiumHelper.showDialogPayWall
 import com.example.eztpaywall_tanhx.PremiumHelper.startIAP
 import com.example.eztpaywall_tanhx.databinding.ActivityMainBinding
 import com.tanhxpurchase.DialogRemoveDefault
+import com.tanhxpurchase.util.logD
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
@@ -26,7 +27,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     @SuppressLint("SetTextI18n")
     override fun initView() {
-
 
     }
 
