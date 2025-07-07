@@ -5,10 +5,12 @@ import com.tanhxpurchase.model.template.DeviceResponse
 import com.tanhxpurchase.model.template.GetTemplateRequest
 import com.tanhxpurchase.model.template.GetTemplateResponse
 import com.tanhxpurchase.model.template.GetTemplateResponseAll
+import com.tanhxpurchase.model.template.IAPPurchase
 import com.tanhxpurchase.model.template.TemplateAll
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface TemplateApiService {
@@ -35,4 +37,14 @@ interface TemplateApiService {
         @Header("Content-Type") contentType: String = "application/json",
         @Body request: DeviceRequest
     ): Response<DeviceResponse>
+
+    @POST("api/v1/iap-logs")
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json"
+    )
+    suspend fun logIAPPurchase(
+        @Header("Access-Token") accessToken: String,
+        @Body purchase: IAPPurchase
+    ): Response<Unit> // hoặc Response<Any> nếu API trả về nội dung cụ thể
 } 

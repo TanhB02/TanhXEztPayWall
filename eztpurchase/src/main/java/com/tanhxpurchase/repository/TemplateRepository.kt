@@ -24,8 +24,6 @@ import kotlinx.coroutines.flow.flow
 class TemplateRepository(
     private val templateApiService: TemplateApiService = NetworkModule.templateApiService
 ) {
-    
-
     //TODO delected ----> get all + flatmap by keys
     fun getTemplatesByKeys(keys: List<String>): Flow<ApiResult<GetTemplateResponse>> = flow {
         try {
@@ -94,7 +92,7 @@ class TemplateRepository(
                 response.body()?.let { body ->
                     logd("Device registration successful: ${body.data.device.id}", "API")
                     
-                    Hawk.put(ACCESS_TOKEN, body.data.access_token)
+                    Hawk.put(ACCESS_TOKEN, body.data.accessToken)
                     logd("Access token saved to storage", "API")
                     
                     emit(ApiResult.Success(body))
