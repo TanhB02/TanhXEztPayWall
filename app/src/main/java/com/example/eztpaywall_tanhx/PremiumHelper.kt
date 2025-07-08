@@ -47,10 +47,6 @@ object PremiumHelper {
         watchAdsCallBack: (() -> Unit)? = null,
     ) {
         var url = getPayWall(activity.packageName,keyConfig = screenName)
-        if (url.isEmpty()) {
-            onFailure.invoke()
-            return
-        }
         lifecycleCoroutineScope.launch {
             PurchaseUtils.showBottomSheetPayWall(
                 activity,
@@ -96,6 +92,4 @@ object PremiumHelper {
             )
         }
     }
-
-
 }

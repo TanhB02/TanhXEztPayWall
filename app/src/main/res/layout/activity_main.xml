@@ -28,4 +28,11 @@
         android:padding="30dp"
         android:text="Dialog" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="huhuhuu"
+        android:textSize="@dimen/fbase_dimen_20" />
+
 </androidx.appcompat.widget.LinearLayoutCompat>

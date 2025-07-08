@@ -89,6 +89,7 @@ open class EztApplication : Application() {
 
     private fun setupPurchaseProducts() {
         val remoteConfig = getRemoteProductConfig()
+        Hawk.put(CONFIG_IAP_KEY, remoteConfig)
         infoProductID = remoteConfig
         producFreetrial = remoteConfig.freeTrial.toString()
 
@@ -101,7 +102,6 @@ open class EztApplication : Application() {
         return try {
             fetchRemoteProductConfig() ?: getDefaultProductConfig()
         } catch (e: Exception) {
-            Hawk.put(CONFIG_IAP_KEY, getDefaultProductConfig())
             getDefaultProductConfig()
         }
     }
@@ -126,7 +126,6 @@ open class EztApplication : Application() {
         return try {
             val remoteConfig = FirebaseRemoteConfig.getInstance()
             val configJson = remoteConfig.getString(CONFIG_IAP_KEY)
-            Hawk.put(CONFIG_IAP_KEY, configJson)
             if (configJson.isNotEmpty()) {
                 Gson().fromJson(configJson, RemoteProductConfig::class.java)
             } else {

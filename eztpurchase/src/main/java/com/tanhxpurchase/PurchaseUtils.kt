@@ -18,7 +18,9 @@ import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
 import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logFirebaseEvent
-import com.tanhxpurchase.worker.paydone.IAPLoggingManager
+import com.tanhxpurchase.util.logd
+import com.tanhxpurchase.util.logeSelf
+import com.tanhxpurchase.worker.WokerMananer.enqueueIAPLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -65,7 +67,14 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
-    fun showDialogPayWall(context: Context, lifecycleCoroutineScope: LifecycleCoroutineScope, url: String, onUpgradeNow: () -> Unit,watchAdsCallBack: () -> Unit, onFailure: () -> Unit) {
+    fun showDialogPayWall(
+        context: Context,
+        lifecycleCoroutineScope: LifecycleCoroutineScope,
+        url: String,
+        onUpgradeNow: () -> Unit,
+        watchAdsCallBack: () -> Unit,
+        onFailure: () -> Unit
+    ) {
         val dialog = DialogPremium(
             context = context,
             lifecycles = lifecycleCoroutineScope,
@@ -74,16 +83,23 @@ object PurchaseUtils : PurchaseUpdateListener {
                 onUpgradeNow()
             },
             watchAdsCallBack = {
-
+                watchAdsCallBack()
             },
             onFailureCallback = {
+                logd("showDialogPayWall onFailureCallback", EZT_Purchase)
                 onFailure()
             }
         )
         dialog.show()
     }
 
-    fun showBottomSheetPayWall(activity: FragmentActivity, url: String, onUpgradeNow: () -> Unit,watchAdsCallBack: () -> Unit, onFailure: () -> Unit) {
+    fun showBottomSheetPayWall(
+        activity: FragmentActivity,
+        url: String,
+        onUpgradeNow: () -> Unit,
+        watchAdsCallBack: () -> Unit,
+        onFailure: () -> Unit
+    ) {
         val bottomSheet = PremiumBottomSheet.newInstance(
             url = url,
             onUpgradeCallback = {
@@ -93,14 +109,15 @@ object PurchaseUtils : PurchaseUpdateListener {
                 watchAdsCallBack()
             },
             onFailureCallback = {
+                logd("showBottomSheetPayWall onFailureCallback", EZT_Purchase)
                 onFailure()
             }
         )
         bottomSheet.show(activity.supportFragmentManager, "PremiumBottomSheet")
     }
 
-    fun getPayWall(packageName : String,keyConfig: String): String {
-        val url = getTemplateUrlByName(packageName,keyConfig)
+    fun getPayWall(packageName: String, keyConfig: String): String {
+        val url = getTemplateUrlByName(packageName, keyConfig)
         logD("TANHXXXX =>>>>> url:${url}")
         return url
     }
@@ -121,7 +138,8 @@ object PurchaseUtils : PurchaseUpdateListener {
         mPurchaseUpdateListener = object : PurchaseUpdateListener {
             override fun onPurchaseSuccess(purchases: Purchase) {
                 onPurchaseSuccess(purchases)
-                IAPLoggingManager.enqueueIAPLogging(activity.applicationContext, purchases)
+                logD("TANHXXXX =>>>>> purchases:${purchases}")
+                enqueueIAPLogging(activity.applicationContext, purchases)
             }
 
             override fun onPurchaseFailure(code: Int, errorMsg: String?) {
@@ -151,7 +169,10 @@ object PurchaseUtils : PurchaseUpdateListener {
             context,
             urlWeb,
             onPurchaseSuccess = onPurchaseSuccess,
-            onReceivedError = onReceivedError,
+            onReceivedError = {
+                onReceivedError?.invoke()
+                logd("startActivityIAP onFailureCallback", EZT_Purchase)
+            },
             onCloseClicked = onCloseClicked,
         )
     }

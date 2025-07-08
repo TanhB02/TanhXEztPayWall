@@ -5,6 +5,8 @@ const val AUTHEN_PAYWALL = "AUTHEN_PAYWALL"
 const val AUTHEN_TRACKING = "AUTHEN_TRACKING"
 const val ACCESS_TOKEN = "ACCESS_TOKEN"
 
+const val CONFIG_IAP_KEY = "config_iap"
+
 const val EZT_Purchase = "EZT_Purchase"
 const val TokenPayWall = "TokenPayWall"
 const val DataTemplate = "DataTemplate"
@@ -34,7 +36,6 @@ const val PayWallIAPDefault = "PayWallIAPDefault"
 const val DialogHighSpeedDefault = "DialogHighSpeedDefault"
 const val DialogProServerDefault = "DialogProServerDefault"
 
-const val CONFIG_IAP_KEY = "config_iap"
 
 const val Base_Plan_Id_1Monthly = "sub-1monthly"
 const val Base_Plan_Id_6Monthly = "sub-6monthly"

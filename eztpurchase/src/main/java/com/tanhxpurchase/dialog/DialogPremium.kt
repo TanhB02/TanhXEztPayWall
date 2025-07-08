@@ -50,6 +50,7 @@ class DialogPremium(
     override fun initViews(binding: DialogPremiumBinding) {
         setCancelable(true)
         if (url.isBlank()) {
+            dissMiss()
             onFailureCallback()
             return
         }
@@ -61,6 +62,7 @@ class DialogPremium(
             currentWebView?.loadUrl(url)
         } catch (e: Exception) {
             if (isShowing) {
+                dissMiss()
                 onFailureCallback()
             }
             return
@@ -69,10 +71,18 @@ class DialogPremium(
         TimeOutWithNoPrice()
     }
 
+    private fun dissMiss(){
+        lifecycles.launch {
+            delay(100)
+            dismiss()
+        }
+    }
+
     private fun TimeOutWithNoPrice() {
         jobTimeOut = lifecycles.launch {
             delay(TimeOut_PayWall_No_Price)
             if (isShowing) {
+                dissMiss()
                 onFailureCallback()
             }
         }
@@ -97,7 +107,7 @@ class DialogPremium(
                     if (isShowing) {
                         onFailureCallback.invoke()
                         jobTimeOut?.cancel()
-                        dismiss()
+                        dissMiss()
                     }
                 })
             }
@@ -116,7 +126,7 @@ class DialogPremium(
             if (isShowing) {
                 onFailureCallback.invoke()
                 jobTimeOut?.cancel()
-                dismiss()
+                dissMiss()
             }
             throw e
         }

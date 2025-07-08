@@ -39,8 +39,6 @@ import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.shineAnimation
 import com.tanhxpurchase.util.toGone
 import com.tanhxpurchase.util.toVisible
-import com.tanhxpurchase.worker.paydone.IAPLoggingManager
-import com.tanhxpurchase.worker.registerdevice.DeviceRegistrationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -316,7 +314,6 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
         if (!isDestroyed && !isFinishing) {
             iapCallback?.onCloseClicked()
         }
-//        DeviceRegistrationManager.enqueueDeviceRegistration(applicationContext)
         finish()
     }
 

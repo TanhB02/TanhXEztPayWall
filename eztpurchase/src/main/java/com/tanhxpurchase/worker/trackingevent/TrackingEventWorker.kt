@@ -1,4 +1,4 @@
-package com.tanhxpurchase.worker.paydone
+package com.tanhxpurchase.worker.trackingevent
 
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -7,16 +7,13 @@ import com.google.gson.Gson
 import com.orhanobut.hawk.Hawk
 import com.tanhxpurchase.ACCESS_TOKEN
 import com.tanhxpurchase.API
-import com.tanhxpurchase.CONFIG_IAP_KEY
-import com.tanhxpurchase.model.Purchase
-import com.tanhxpurchase.model.RemoteProductConfig
-import com.tanhxpurchase.model.template.IAPPurchase
+import com.tanhxpurchase.model.template.TrackingEventRequest
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 
-class IAPLoggingWorker(
+class TrackingEventWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
@@ -25,46 +22,42 @@ class IAPLoggingWorker(
 
     override suspend fun doWork(): Result {
         return try {
+            // ✅ Chỉ retry 1 lần duy nhất
             if (runAttemptCount >= 1) {
+                logd("TrackingEventWorker: Already retried once, giving up", API)
                 return Result.failure()
             }
 
-            val purchaseJson = inputData.getString(KEY_PURCHASE_DATA)
-            if (purchaseJson.isNullOrEmpty()) {
+            val eventJson = inputData.getString(KEY_EVENT_DATA)
+            if (eventJson.isNullOrEmpty()) {
+                logd("TrackingEventWorker: Event data not found", API)
                 return Result.failure()
             }
 
-            val purchase = Gson().fromJson(purchaseJson, Purchase::class.java)
-            val iapPurchase = IAPPurchase.from(purchase)
-            if (iapPurchase.payload?.productId in Hawk.get<RemoteProductConfig>(
-                    CONFIG_IAP_KEY,
-                    null
-                ).oneTimeProducts
-            ) {
-                iapPurchase.type = 2
-            }
+            val trackingEvent = Gson().fromJson(eventJson, TrackingEventRequest::class.java)
 
             var finalResult: Result = Result.failure()
             val accessToken = Hawk.get<String>(ACCESS_TOKEN, null)
             if (accessToken.isNullOrEmpty()) {
+                logd("TrackingEventWorker: Access token not found, registering device first", API)
                 enqueueDeviceRegistration(applicationContext)
                 return Result.retry()
             }
 
-            repository.logIAPPurchase(iapPurchase).collect { result ->
+            logd("TrackingEventWorker: Processing tracking event - Type: ${trackingEvent.type}, Template: ${trackingEvent.templateId}", API)
+
+            repository.logTrackingEvent(trackingEvent).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
-                        logd("IAPLoggingWorker: API call in progress...", API)
+                        logd("TrackingEventWorker: API call in progress...", API)
                     }
-
                     is ApiResult.Success -> {
-                        logd("IAPLoggingWorker: successful - ID: ${result.data.data.id}", API)
+                        logd("TrackingEventWorker: Tracking event logged successfully - ID: ${result.data.data.id}", API)
                         finalResult = Result.success()
                         return@collect
                     }
-
                     is ApiResult.Error -> {
-                        logd("IAPLoggingWorker: IAP logging failed - ${result.message}", API)
+                        logd("TrackingEventWorker: Tracking event logging failed - ${result.message}", API)
                         finalResult = Result.retry()
                         return@collect
                     }
@@ -73,12 +66,12 @@ class IAPLoggingWorker(
 
             finalResult
         } catch (e: Exception) {
-            logd("IAPLoggingWorker: Exception occurred - ${e.message}", API)
+            logd("TrackingEventWorker: Exception occurred - ${e.message}", API)
             Result.retry()
         }
     }
 
     companion object {
-        const val KEY_PURCHASE_DATA = "purchase_data"
+        const val KEY_EVENT_DATA = "event_data"
     }
 }

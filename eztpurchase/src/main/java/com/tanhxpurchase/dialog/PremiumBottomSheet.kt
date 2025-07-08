@@ -151,8 +151,8 @@ class PremiumBottomSheet :
             when (data.replace("\"", "")) {
                 UPGRADE -> {
                     logFirebaseEvent("action_click_upgrade_premium")
-                    dismiss()
                     onUpgradeCallback?.invoke()
+                    dismiss()
                 }
                 WATCH_ADS ->{
                     logFirebaseEvent("action_watch_reward_ads_dialog")

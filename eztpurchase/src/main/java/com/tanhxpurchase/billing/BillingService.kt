@@ -565,7 +565,16 @@ internal class BillingService private constructor() : PurchasesUpdatedListener,
                 val productDetails = productDetailMap[productId]
                 it.onPurchaseSuccess(
                     com.tanhxpurchase.model.Purchase(
-                        productId, productDetails!!.productType, purchase.quantity
+                        productId = productId,
+                        type = productDetails!!.productType,
+                        quantity = purchase.quantity,
+                        orderId = purchase.orderId,
+                        packageName = purchase.packageName,
+                        purchaseToken = purchase.purchaseToken,
+                        purchaseTime = purchase.purchaseTime,
+                        purchaseState = purchase.purchaseState,
+                        autoRenewing = purchase.isAutoRenewing,
+                        acknowledged = purchase.isAcknowledged
                     )
                 )
             } catch (e: Exception) {

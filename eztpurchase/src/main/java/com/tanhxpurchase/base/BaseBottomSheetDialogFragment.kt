@@ -13,6 +13,7 @@ import androidx.databinding.ViewDataBinding
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 
 open class BaseBottomSheetDialogFragment<T : ViewDataBinding>(@LayoutRes contentLayout: Int) :
     BottomSheetDialogFragment(contentLayout) {
@@ -54,6 +55,7 @@ open class BaseBottomSheetDialogFragment<T : ViewDataBinding>(@LayoutRes content
         addEvent()
         addObservers()
         initData()
+        enqueueDeviceRegistration(requireActivity().applicationContext)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             isEnabled = false
             dismiss()
@@ -74,7 +76,6 @@ open class BaseBottomSheetDialogFragment<T : ViewDataBinding>(@LayoutRes content
     protected open fun setupBehavior(behavior: BottomSheetBehavior<*>) {
 
     }
-
 
     protected fun post(task: Runnable) {
         binding.root.post(task)

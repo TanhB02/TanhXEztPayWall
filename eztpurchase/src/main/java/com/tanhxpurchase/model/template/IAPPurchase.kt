@@ -13,30 +13,18 @@ data class IAPPurchase(
     var step: Int = 1
 ) {
     companion object {
-        fun from(purchase: BillingPurchase): IAPPurchase {
-            return IAPPurchase().apply {
-                payload?.let { pload ->
-                    pload.purchaseTime = purchase.purchaseTime
-                    pload.purchaseState = purchase.purchaseState
-                    pload.purchaseToken = purchase.purchaseToken
-                    pload.packageName = purchase.packageName
-                    pload.productId = purchase.products.getOrNull(0)
-                    pload.orderId = purchase.orderId
-                    pload.quantity = purchase.quantity
-                    pload.autoRenewing = purchase.isAutoRenewing
-                    pload.acknowledged = purchase.isAcknowledged
-                }
-            }
-        }
-        
         fun from(purchase: CustomPurchase): IAPPurchase {
             return IAPPurchase().apply {
                 payload?.let { pload ->
                     pload.productId = purchase.productId
                     pload.quantity = purchase.quantity
-                    pload.purchaseTime = System.currentTimeMillis()
-                    pload.purchaseState = 1
-
+                    pload.purchaseTime = purchase.purchaseTime
+                    pload.purchaseState = purchase.purchaseState
+                    pload.orderId = purchase.orderId
+                    pload.packageName = purchase.packageName
+                    pload.purchaseToken = purchase.purchaseToken
+                    pload.autoRenewing = purchase.autoRenewing
+                    pload.acknowledged = purchase.acknowledged
                 }
             }
         }

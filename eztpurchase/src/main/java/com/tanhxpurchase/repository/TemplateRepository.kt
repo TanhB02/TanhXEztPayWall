@@ -15,6 +15,8 @@ import com.tanhxpurchase.model.template.IAPPurchase
 import com.tanhxpurchase.model.template.IapLogResponse
 import com.tanhxpurchase.model.template.TemplateAll
 import com.tanhxpurchase.model.template.TemplateKeyParam
+import com.tanhxpurchase.model.template.TrackingEventRequest
+import com.tanhxpurchase.model.template.TrackingEventResponse
 import com.tanhxpurchase.network.NetworkModule
 import com.tanhxpurchase.network.TemplateApiService
 import com.tanhxpurchase.util.ApiResult
@@ -154,6 +156,7 @@ class TemplateRepository(
                 emit(ApiResult.Error("Access token not found"))
                 return@flow
             }
+
             val response = templateApiService.logIAPPurchase(
                 accessToken = accessToken,
                 purchase = iapPurchase
@@ -161,10 +164,8 @@ class TemplateRepository(
             
             if (response.isSuccessful) {
                 response.body()?.let { body ->
-                    logd("IAP logging successful: ${body.data.id}", API)
                     emit(ApiResult.Success(body))
                 } ?: run {
-                    logd("IAP logging response body is null", API)
                     emit(ApiResult.Error("Response body is null"))
                 }
             } else {
@@ -174,6 +175,43 @@ class TemplateRepository(
             }
         } catch (e: Exception) {
             val errorMessage = "IAP logging exception: ${e.message ?: "Unknown error occurred"}"
+            logd(errorMessage, API)
+            emit(ApiResult.Error(errorMessage))
+        }
+    }
+
+    fun logTrackingEvent(trackingEvent: TrackingEventRequest): Flow<ApiResult<TrackingEventResponse>> = flow {
+        try {
+            emit(ApiResult.Loading)
+
+            val accessToken = Hawk.get<String>(ACCESS_TOKEN, null)
+            if (accessToken.isNullOrEmpty()) {
+                emit(ApiResult.Error("Access token not found"))
+                return@flow
+            }
+
+            logd("TemplateRepository: Sending tracking event to API - Type: ${trackingEvent.type}, Template: ${trackingEvent.templateId}", API)
+
+            val response = templateApiService.logTrackingEvent(
+                accessToken = accessToken,
+                request = trackingEvent
+            )
+
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    logd("TemplateRepository: Tracking event logged successfully - ID: ${body.data.id}", API)
+                    emit(ApiResult.Success(body))
+                } ?: run {
+                    logd("TemplateRepository: Tracking event response body is null", API)
+                    emit(ApiResult.Error("Response body is null"))
+                }
+            } else {
+                val errorMessage = "Tracking event logging failed: ${response.code()} - ${response.message()}"
+                logd(errorMessage, API)
+                emit(ApiResult.Error(errorMessage))
+            }
+        } catch (e: Exception) {
+            val errorMessage = "Tracking event logging exception: ${e.message ?: "Unknown error occurred"}"
             logd(errorMessage, API)
             emit(ApiResult.Error(errorMessage))
         }
