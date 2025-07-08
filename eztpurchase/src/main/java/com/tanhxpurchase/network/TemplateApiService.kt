@@ -6,6 +6,7 @@ import com.tanhxpurchase.model.template.GetTemplateRequest
 import com.tanhxpurchase.model.template.GetTemplateResponse
 import com.tanhxpurchase.model.template.GetTemplateResponseAll
 import com.tanhxpurchase.model.template.IAPPurchase
+import com.tanhxpurchase.model.template.IapLogResponse
 import com.tanhxpurchase.model.template.TemplateAll
 import retrofit2.Response
 import retrofit2.http.Body
@@ -46,5 +47,5 @@ interface TemplateApiService {
     suspend fun logIAPPurchase(
         @Header("Access-Token") accessToken: String,
         @Body purchase: IAPPurchase
-    ): Response<Unit> // hoặc Response<Any> nếu API trả về nội dung cụ thể
+    ): Response<IapLogResponse>
 } 

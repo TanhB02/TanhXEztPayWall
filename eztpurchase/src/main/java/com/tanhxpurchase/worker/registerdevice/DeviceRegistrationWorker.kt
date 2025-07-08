@@ -1,4 +1,4 @@
-package com.tanhxpurchase.worker
+package com.tanhxpurchase.worker.registerdevice
 
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -8,10 +8,11 @@ import com.tanhxpurchase.AUTHEN_TRACKING
 import com.tanhxpurchase.API
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
+import com.tanhxpurchase.util.JwtPayWall.generateTrackingToken
 import com.tanhxpurchase.util.logd
 
 class DeviceRegistrationWorker(
-    var context: Context,
+    context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
@@ -20,13 +21,12 @@ class DeviceRegistrationWorker(
     override suspend fun doWork(): Result {
         return try {
             val trackingToken = Hawk.get<String>(AUTHEN_TRACKING, null)
-            if (trackingToken.isNullOrEmpty(    )) {
-                logd("DeviceRegistrationWorker: Tracking token not found", API)
-                return Result.failure()
+            if (trackingToken.isNullOrEmpty()) {
+                generateTrackingToken(applicationContext, applicationContext.packageName)
             }
             var finalResult: Result = Result.failure()
 
-            repository.registerDevice(context).collect { result ->
+            repository.registerDevice(applicationContext).collect { result ->
                 when (result) {
                     is ApiResult.Loading -> {
                         logd("DeviceRegistrationWorker: loadding", API)

@@ -76,7 +76,6 @@ object JwtPayWall {
         val currentToken = Hawk.get<String>(AUTHEN_TRACKING, null)
         val currentTime = System.currentTimeMillis() / 1000
         val tokenExpiration = 24 * 60 * 60 // 1 day in seconds
-
         if (currentToken != null) {
             logD("TokenPayWall : ${currentToken}")
             try {

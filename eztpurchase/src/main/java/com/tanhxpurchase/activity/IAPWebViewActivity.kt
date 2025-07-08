@@ -39,9 +39,9 @@ import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.shineAnimation
 import com.tanhxpurchase.util.toGone
 import com.tanhxpurchase.util.toVisible
-import com.tanhxpurchase.worker.DeviceRegistrationManager
+import com.tanhxpurchase.worker.paydone.IAPLoggingManager
+import com.tanhxpurchase.worker.registerdevice.DeviceRegistrationManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -235,7 +235,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
 
     override fun onDestroy() {
         super.onDestroy()
-        logD("TANHXXXX =>>>>> ondestroy ")
+        logD("TANHXXXX =>>>>> ondestroy")
         jobTimeOut?.cancel()
     }
 
@@ -244,7 +244,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
         PurchaseUtils.buy(
             this,
             producID,
-            onPurchaseSuccess = {
+            onPurchaseSuccess = { purchase ->
                 if (!isDestroyed && !isFinishing) {
                     iapCallback?.onPurchaseSuccess()
                     finish()
@@ -316,10 +316,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
         if (!isDestroyed && !isFinishing) {
             iapCallback?.onCloseClicked()
         }
-        GlobalScope.launch {
-            delay(3000)
-            DeviceRegistrationManager.enqueueDeviceRegistration(applicationContext)
-        }
+//        DeviceRegistrationManager.enqueueDeviceRegistration(applicationContext)
         finish()
     }
 

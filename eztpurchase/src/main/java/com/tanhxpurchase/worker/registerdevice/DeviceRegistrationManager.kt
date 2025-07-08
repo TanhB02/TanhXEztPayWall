@@ -1,4 +1,4 @@
-package com.tanhxpurchase.worker
+package com.tanhxpurchase.worker.registerdevice
 
 import android.content.Context
 import androidx.work.Constraints
@@ -35,15 +35,6 @@ object DeviceRegistrationManager {
             
         } catch (e: Exception) {
             logd("Failed to enqueue device registration work: ${e.message}", API)
-        }
-    }
-    
-    fun cancelDeviceRegistration(context: Context) {
-        try {
-            WorkManager.getInstance(context).cancelUniqueWork(DEVICE_REGISTRATION_WORK_NAME)
-            logd("Device registration work cancelled", API)
-        } catch (e: Exception) {
-            logd("Failed to cancel device registration work: ${e.message}", API)
         }
     }
 }

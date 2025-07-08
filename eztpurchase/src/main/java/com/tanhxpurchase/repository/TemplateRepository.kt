@@ -3,6 +3,7 @@ package com.tanhxpurchase.repository
 import android.content.Context
 import com.orhanobut.hawk.Hawk
 import com.tanhxpurchase.ACCESS_TOKEN
+import com.tanhxpurchase.API
 import com.tanhxpurchase.AUTHEN_PAYWALL
 import com.tanhxpurchase.AUTHEN_TRACKING
 import com.tanhxpurchase.model.template.DeviceRequest
@@ -10,6 +11,8 @@ import com.tanhxpurchase.model.template.DeviceResponse
 import com.tanhxpurchase.model.template.GetTemplateRequest
 import com.tanhxpurchase.model.template.GetTemplateResponse
 import com.tanhxpurchase.model.template.GetTemplateResponseAll
+import com.tanhxpurchase.model.template.IAPPurchase
+import com.tanhxpurchase.model.template.IapLogResponse
 import com.tanhxpurchase.model.template.TemplateAll
 import com.tanhxpurchase.model.template.TemplateKeyParam
 import com.tanhxpurchase.network.NetworkModule
@@ -63,12 +66,10 @@ class TemplateRepository(
 
             //Token còn hạn
             if (!existingAccessToken.isNullOrEmpty() && !isTrackingExpired) {
-                logd("Access token exists and tracking token still valid, skipping API call", "API")
+                logd("Access token exists and tracking token still valid, skipping API call", API)
                 return@flow
             }
-            
-            logd("Need to call API - Access token exists: ${!existingAccessToken.isNullOrEmpty()}, Tracking expired: $isTrackingExpired", "API")
-            
+            logd("Need to call API - Access token exists: ${!existingAccessToken.isNullOrEmpty()}, Tracking expired: $isTrackingExpired", API)
             if (isTrackingExpired) {
                 generateTrackingToken(context, context.packageName)
             }
@@ -77,12 +78,12 @@ class TemplateRepository(
             
             val trackingToken = Hawk.get<String>(AUTHEN_TRACKING, null)
             if (trackingToken.isNullOrEmpty()) {
-                logd("Failed to get tracking token after generation", "API")
+                logd("Failed to get tracking token after generation", API)
                 emit(ApiResult.Error("Failed to get tracking token"))
                 return@flow
             }
             
-            logd("Calling device registration API", "API")
+            logd("Calling device registration API", API)
             
             val request = DeviceRequest(secret = trackingToken)
             
@@ -90,29 +91,27 @@ class TemplateRepository(
             
             if (response.isSuccessful) {
                 response.body()?.let { body ->
-                    logd("Device registration successful: ${body.data.device.id}", "API")
+                    logd("Device registration successful: ${body.data.device.id}", API)
                     
                     Hawk.put(ACCESS_TOKEN, body.data.accessToken)
-                    logd("Access token saved to storage", "API")
+                    logd("Access token saved to storage", API)
                     
                     emit(ApiResult.Success(body))
                 } ?: run {
-                    logd("Device registration response body is null", "API")
+                    logd("Device registration response body is null", API)
                     emit(ApiResult.Error("Response body is null"))
                 }
             } else {
                 val errorMessage = "Device registration failed: ${response.code()} - ${response.message()}"
-                logd(errorMessage, "API")
+                logd(errorMessage, API)
                 emit(ApiResult.Error(errorMessage))
             }
         } catch (e: Exception) {
             val errorMessage = "Device registration exception: ${e.message ?: "Unknown error occurred"}"
-            logd(errorMessage, "API")
+            logd(errorMessage, API)
             emit(ApiResult.Error(errorMessage))
         }
     }
-
-
 
     fun getTemplatesByPackageId(packageId: String): Flow<ApiResult<GetTemplateResponseAll>> = flow {
         emit(ApiResult.Loading)
@@ -143,6 +142,40 @@ class TemplateRepository(
 
         } catch (e: Exception) {
             emit(ApiResult.Error("Network/API exception: ${e.localizedMessage ?: "Unknown error"}"))
+        }
+    }
+    
+    fun logIAPPurchase(iapPurchase: IAPPurchase): Flow<ApiResult<IapLogResponse>> = flow {
+        try {
+            emit(ApiResult.Loading)
+            
+            val accessToken = Hawk.get<String>(ACCESS_TOKEN, null)
+            if (accessToken.isNullOrEmpty()) {
+                emit(ApiResult.Error("Access token not found"))
+                return@flow
+            }
+            val response = templateApiService.logIAPPurchase(
+                accessToken = accessToken,
+                purchase = iapPurchase
+            )
+            
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    logd("IAP logging successful: ${body.data.id}", API)
+                    emit(ApiResult.Success(body))
+                } ?: run {
+                    logd("IAP logging response body is null", API)
+                    emit(ApiResult.Error("Response body is null"))
+                }
+            } else {
+                val errorMessage = "IAP logging failed: ${response.code()} - ${response.message()}"
+                logd(errorMessage, API)
+                emit(ApiResult.Error(errorMessage))
+            }
+        } catch (e: Exception) {
+            val errorMessage = "IAP logging exception: ${e.message ?: "Unknown error occurred"}"
+            logd(errorMessage, API)
+            emit(ApiResult.Error(errorMessage))
         }
     }
 }

@@ -10,10 +10,8 @@ import com.tanhxpurchase.model.RemoteProductConfig
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.sharepreference.EzTechPreferences.producFreetrial
 import com.tanhxpurchase.util.ApiResult
-import com.tanhxpurchase.util.JwtPayWall.generateTrackingToken
 import com.tanhxpurchase.util.JwtPayWall.jwtToken
 import com.tanhxpurchase.util.TemplateDataManager
-import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

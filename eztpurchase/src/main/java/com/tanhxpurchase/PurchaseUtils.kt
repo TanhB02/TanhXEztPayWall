@@ -18,6 +18,7 @@ import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
 import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logFirebaseEvent
+import com.tanhxpurchase.worker.paydone.IAPLoggingManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -120,6 +121,7 @@ object PurchaseUtils : PurchaseUpdateListener {
         mPurchaseUpdateListener = object : PurchaseUpdateListener {
             override fun onPurchaseSuccess(purchases: Purchase) {
                 onPurchaseSuccess(purchases)
+                IAPLoggingManager.enqueueIAPLogging(activity.applicationContext, purchases)
             }
 
             override fun onPurchaseFailure(code: Int, errorMsg: String?) {

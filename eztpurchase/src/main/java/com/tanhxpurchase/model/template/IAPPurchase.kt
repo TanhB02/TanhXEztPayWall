@@ -1,20 +1,19 @@
 package com.tanhxpurchase.model.template
 
-import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.Purchase as BillingPurchase
+import com.tanhxpurchase.model.Purchase as CustomPurchase
 import com.google.gson.annotations.SerializedName
 
 data class IAPPurchase(
     @SerializedName("type")
     var type: Int = 1,
-
     @SerializedName("payload")
     var payload: IAPPayload? = IAPPayload(),
-
     @SerializedName("step")
     var step: Int = 1
 ) {
     companion object {
-        fun from(purchase: Purchase): IAPPurchase {
+        fun from(purchase: BillingPurchase): IAPPurchase {
             return IAPPurchase().apply {
                 payload?.let { pload ->
                     pload.purchaseTime = purchase.purchaseTime
@@ -26,6 +25,18 @@ data class IAPPurchase(
                     pload.quantity = purchase.quantity
                     pload.autoRenewing = purchase.isAutoRenewing
                     pload.acknowledged = purchase.isAcknowledged
+                }
+            }
+        }
+        
+        fun from(purchase: CustomPurchase): IAPPurchase {
+            return IAPPurchase().apply {
+                payload?.let { pload ->
+                    pload.productId = purchase.productId
+                    pload.quantity = purchase.quantity
+                    pload.purchaseTime = System.currentTimeMillis()
+                    pload.purchaseState = 1
+
                 }
             }
         }
@@ -54,3 +65,40 @@ data class IAPPayload(
     @SerializedName("acknowledged")
     var acknowledged: Boolean = false
 )
+
+data class IapLogResponse(
+    @SerializedName("data")
+    val data: IapLogData
+)
+
+data class IapLogData(
+    @SerializedName("type")
+    val type: Int,
+    @SerializedName("payload")
+    val payload: IAPPayload?,
+    @SerializedName("step")
+    val step: Int,
+    @SerializedName("store_temporary_id")
+    val storeTemporaryId: String?,
+    @SerializedName("device_id")
+    val deviceId: String?,
+    @SerializedName("id_db")
+    val idDb: Int,
+    @SerializedName("order_id_md5")
+    val orderIdMd5: String?,
+    @SerializedName("purchase_token_md5")
+    val purchaseTokenMd5: String?,
+    @SerializedName("subscription_temp_id")
+    val subscriptionTempId: String?,
+    @SerializedName("purchase_time")
+    val purchaseTime: Long,
+    @SerializedName("firebase_type")
+    val firebaseType: Int,
+    @SerializedName("updated_at")
+    val updatedAt: String?,
+    @SerializedName("created_at")
+    val createdAt: String?,
+    @SerializedName("id")
+    val id: String?
+)
+
