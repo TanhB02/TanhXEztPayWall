@@ -1,27 +1,34 @@
 package com.tanhxpurchase.dialog
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.lib.tanhx_purchase.R
 import com.lib.tanhx_purchase.databinding.BottomSheetPremiumBinding
-import com.tanhxpurchase.Android
-import com.tanhxpurchase.PAYLOAD_RECEIVED
-import com.tanhxpurchase.TimeOut_PayWall_No_Price
-import com.tanhxpurchase.UPGRADE
-import com.tanhxpurchase.WATCH_ADS
+import com.tanhxpurchase.ConstantsPurchase.Android
+import com.tanhxpurchase.ConstantsPurchase.PAYLOAD_RECEIVED
+import com.tanhxpurchase.PurchaseUtils
+import com.tanhxpurchase.PurchaseUtils.getPayWall
+import com.tanhxpurchase.TrackingUtils.trackingBuy
+import com.tanhxpurchase.TrackingUtils.trackingCloseScreen
+import com.tanhxpurchase.TrackingUtils.trackingShowScreen
+import com.tanhxpurchase.TrackingUtils.trackingUpgrade
+import com.tanhxpurchase.TrackingUtils.trackingWatchAds
+import com.tanhxpurchase.ConstantsPurchase.UPGRADE
+import com.tanhxpurchase.ConstantsPurchase.WATCH_ADS
 import com.tanhxpurchase.activity.IAPWebViewViewModel
 import com.tanhxpurchase.base.BaseBottomSheetDialogFragment
+import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
 import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.util.configureWebViewSettings
 import com.tanhxpurchase.util.logD
-import com.tanhxpurchase.util.logFirebaseEvent
+import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.toGone
-import com.tanhxpurchase.util.toVisible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -34,23 +41,29 @@ class PremiumBottomSheet :
     private val viewModel: IAPWebViewViewModel by viewModels()
     private var currentWebView: WebView? = null
     private var injectionScript: String? = null
-    private var url: String = ""
+    private lateinit var screenName: String
+    private lateinit var url: String
+    private lateinit var isFromTo: String
     private var onUpgradeCallback: (() -> Unit)? = null
     private var watchAdsCallBack: (() -> Unit)? = null
     private var onFailureCallback: (() -> Unit)? = null
-    private var jobTimeOut : Job? = null
+    private var jobTimeOut: Job? = null
+
     companion object {
-        private const val ARG_URL = "url"
+        private const val SCREEEN_NAME = "screen_name"
+        private const val IS_FROM_TO = "is_from_to"
 
         fun newInstance(
-            url: String,
+            screenName: String,
+            isFromTo: String,
             onUpgradeCallback: () -> Unit,
             onFailureCallback: () -> Unit,
             watchAdsCallBack: (() -> Unit)? = null
         ): PremiumBottomSheet {
             return PremiumBottomSheet().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_URL, url)
+                    putString(SCREEEN_NAME, screenName)
+                    putString(IS_FROM_TO, isFromTo)
                 }
                 this.onUpgradeCallback = onUpgradeCallback
                 this.onFailureCallback = onFailureCallback
@@ -61,7 +74,9 @@ class PremiumBottomSheet :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        url = arguments?.getString(ARG_URL) ?: ""
+        screenName = arguments?.getString(SCREEEN_NAME) ?: ""
+        isFromTo = arguments?.getString(IS_FROM_TO) ?: ""
+        url = getPayWall(requireActivity().packageName,screenName)
     }
 
     override fun initViewModel() {
@@ -69,18 +84,40 @@ class PremiumBottomSheet :
         injectionScript = viewModel.createInjectionScript(requireContext())
     }
 
-    private fun TimeOutWithNoPrice(){
+    private fun TimeOutWithNoPrice() {
         jobTimeOut = lifecycleScope.launch {
-            delay(TimeOut_PayWall_No_Price)
-            onFailureCallback?.invoke()
+            delay(timeOutPayWall)
+            if (isVisible && !isDetached) {
+                onFailureCallback?.invoke()
+            }
             jobTimeOut?.cancel()
         }
     }
 
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        trackingCloseScreen(requireActivity(), screenName, isFromTo)
+    }
+
     override fun initView() {
+        if (url.isBlank()) {
+            onFailureCallback?.invoke()
+            dismiss()
+            return
+        }
         setupWebView()
         logD("TANHXXXX =>>>>> url:${url}")
-        currentWebView?.loadUrl(url)
+        try {
+            currentWebView?.loadUrl(url)
+        } catch (e: Exception) {
+            if (isVisible && !isDetached) {
+                onFailureCallback?.invoke()
+                dismiss()
+            }
+            return
+        }
+        trackingShowScreen(requireActivity(), screenName,isFromTo)
         TimeOutWithNoPrice()
     }
 
@@ -92,13 +129,19 @@ class PremiumBottomSheet :
         currentWebView = createWebView()
             .apply {
                 setupWebViewClientWithTimeout(lifecycleScope, onPageFinished = { webView, url ->
-                    injectionScript?.let {
-                        evaluateJavascript(it, null)
+                    try {
+                        if (injectionScript != null && isVisible && !isDetached) {
+                            evaluateJavascript(injectionScript!!, null)
+                        }
+                    } catch (e: Exception) {
+                        logd("TANHXXXX => Error evaluating JavaScript in PremiumBottomSheet: ${e.message}")
                     }
                 }, onReceivedError = {
-                    dismiss()
-                    onFailureCallback?.invoke()
-                    jobTimeOut?.cancel()
+                    if (isVisible && !isDetached) {
+                        onFailureCallback?.invoke()
+                        jobTimeOut?.cancel()
+                        dismiss()
+                    }
                 })
             }
         binding.webViewContainer.addView(currentWebView)
@@ -112,29 +155,54 @@ class PremiumBottomSheet :
                 addJavascriptInterface(IAPWebInterface(this@PremiumBottomSheet), Android)
             }
         } catch (e: Exception) {
-            onFailureCallback?.invoke()
-            jobTimeOut?.cancel()
-            dismiss()
+            logd("TANHXXXX => Error creating WebView in PremiumBottomSheet: ${e.message}")
+            if (isVisible && !isDetached) {
+                onFailureCallback?.invoke()
+                jobTimeOut?.cancel()
+                dismiss()
+            }
             throw e
         }
     }
 
+    private fun buyProduct(producID: String) {
+        PurchaseUtils.buy(
+            requireActivity(),
+            producID,
+            onPurchaseSuccess = { purchase ->
+                dismiss()
+            },
+            onPurchaseFailure = { code, errorMsg ->
+
+            }
+        )
+    }
+
     override fun onUserClickListener(data: String) {
+        if (!isVisible || isDetached) return
         lifecycleScope.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
                 UPGRADE -> {
-                    logFirebaseEvent("action_click_upgrade_premium")
-                    dismiss()
+                    trackingUpgrade(requireActivity(), screenName,isFromTo)
                     onUpgradeCallback?.invoke()
+                    dismiss()
                 }
-                WATCH_ADS ->{
-                    logFirebaseEvent("action_watch_reward_ads_dialog")
+
+                WATCH_ADS -> {
+                    trackingWatchAds(requireActivity(), screenName,isFromTo)
                     watchAdsCallBack?.invoke()
                     dismiss()
                 }
-                PAYLOAD_RECEIVED ->{
+
+                PAYLOAD_RECEIVED -> {
                     binding.frLoadding.toGone()
                     jobTimeOut?.cancel()
+                }
+
+                else -> {
+                    trackingBuy(requireActivity(),screenName,data,isFromTo)
+                    buyProduct(data)
+                    dismiss()
                 }
             }
         }

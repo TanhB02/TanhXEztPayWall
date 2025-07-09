@@ -22,3 +22,32 @@ data class Template(
     @SerializedName("thumbnail")
     val thumbnail: String?
 )
+
+data class TemplateKeyParam(
+    @SerializedName("params")
+    val params: String
+)
+
+data class GetTemplateRequest(
+    @SerializedName("keys")
+    val keys: List<TemplateKeyParam>
+)
+
+data class TemplateData(
+    @SerializedName("value")
+    val value: String,
+    @SerializedName("templates")
+    val templates: List<Template>
+)
+
+data class TemplateResponse(
+    @SerializedName("params")
+    val params: String,
+    @SerializedName("data")
+    val data: List<TemplateData>
+)
+
+data class GetTemplateResponse(
+    @SerializedName("data")
+    val data: List<TemplateResponse>
+)

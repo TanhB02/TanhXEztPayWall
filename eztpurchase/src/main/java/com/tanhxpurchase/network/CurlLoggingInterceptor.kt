@@ -1,7 +1,7 @@
 package com.tanhxpurchase.network
 
 import android.util.Log
-import com.tanhxpurchase.EZT_Purchase
+import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response

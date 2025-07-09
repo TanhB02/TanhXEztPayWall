@@ -20,13 +20,13 @@ import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.tanhxpurchase.EZT_Purchase
+import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
 import com.tanhxpurchase.listeners.PurchaseUpdateListener
-import com.tanhxpurchase.model.BasePlanSubscription
-import com.tanhxpurchase.model.OfferSubscription
-import com.tanhxpurchase.model.OnetimeProduct
-import com.tanhxpurchase.model.Subscription
-import com.tanhxpurchase.sharepreference.EzTechPreferences
+import com.tanhxpurchase.model.iap.BasePlanSubscription
+import com.tanhxpurchase.model.iap.OfferSubscription
+import com.tanhxpurchase.model.iap.OnetimeProduct
+import com.tanhxpurchase.model.iap.Subscription
+import com.tanhxpurchase.hawk.EzTechHawk
 import com.tanhxpurchase.util.createStandardJsonPayload
 import com.tanhxpurchase.util.findAllBasePlan
 import com.tanhxpurchase.util.logd
@@ -82,7 +82,7 @@ internal class BillingService private constructor() : PurchasesUpdatedListener,
 
     init {
         val ownedProduct = Gson().fromJson<List<String>>(
-            EzTechPreferences.valueOf("ownedProduct", ""),
+            EzTechHawk.valueOf("ownedProduct", ""),
             object : TypeToken<List<String>>() {}.type
         )
         if (ownedProduct != null) {
@@ -326,7 +326,7 @@ internal class BillingService private constructor() : PurchasesUpdatedListener,
                 processPurchase(productPurchaseResult.purchasesList)
             }
             logDebug("Finish query purchase.... Found ${_ownedProducts.value.size} purchases")
-            EzTechPreferences.setValue(
+            EzTechHawk.setValue(
                 "ownedProduct",
                 Gson().toJson(_ownedProducts.value.toMutableList())
             )
@@ -564,8 +564,17 @@ internal class BillingService private constructor() : PurchasesUpdatedListener,
             try {
                 val productDetails = productDetailMap[productId]
                 it.onPurchaseSuccess(
-                    com.tanhxpurchase.model.Purchase(
-                        productId, productDetails!!.productType, purchase.quantity
+                    com.tanhxpurchase.model.iap.Purchase(
+                        productId = productId,
+                        type = productDetails!!.productType,
+                        quantity = purchase.quantity,
+                        orderId = purchase.orderId,
+                        packageName = purchase.packageName,
+                        purchaseToken = purchase.purchaseToken,
+                        purchaseTime = purchase.purchaseTime,
+                        purchaseState = purchase.purchaseState,
+                        autoRenewing = purchase.isAutoRenewing,
+                        acknowledged = purchase.isAcknowledged
                     )
                 )
             } catch (e: Exception) {

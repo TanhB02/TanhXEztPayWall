@@ -8,7 +8,8 @@ import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
-import com.tanhxpurchase.sharepreference.EzTechPreferences
+import com.tanhxpurchase.hawk.EzTechHawk
+import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 import java.util.Locale
 
 abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
@@ -29,6 +30,8 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
         initView()
         observeViewModel()
         addEvent()
+        enqueueDeviceRegistration(applicationContext)
+
     }
 
     private fun hideSystemUI() {
@@ -42,7 +45,7 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     }
 
     private fun updateLanguage() {
-        val locale = Locale(EzTechPreferences.countryCode, "")
+        val locale = Locale(EzTechHawk.countryCode, "")
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         config.setLayoutDirection(Locale("en"))

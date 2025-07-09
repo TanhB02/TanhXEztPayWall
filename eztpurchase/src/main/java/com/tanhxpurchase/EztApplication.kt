@@ -1,28 +1,32 @@
 package com.tanhxpurchase
 
 import android.app.Application
-import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import com.orhanobut.hawk.Hawk
-import com.tanhxpurchase.model.RemoteProductConfig
+import com.tanhxpurchase.ConstantsPurchase.CONFIG_IAP_KEY
+import com.tanhxpurchase.ConstantsPurchase.DataTemplate
+import com.tanhxpurchase.hawk.EzTechHawk.accessToken
+import com.tanhxpurchase.hawk.EzTechHawk.configIAP
+import com.tanhxpurchase.model.iap.RemoteProductConfig
 import com.tanhxpurchase.repository.TemplateRepository
-import com.tanhxpurchase.sharepreference.EzTechPreferences.producFreetrial
+import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
 import com.tanhxpurchase.util.ApiResult
-import com.tanhxpurchase.util.JwtPayWall
+import com.tanhxpurchase.util.JwtPayWall.jwtToken
 import com.tanhxpurchase.util.TemplateDataManager
 import com.tanhxpurchase.util.logD
+import com.tanhxpurchase.util.logd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-open class EztApplication : Application() {
+abstract class EztApplication : Application() {
 
     companion object {
-        var infoProductID : RemoteProductConfig? = null
+        var infoProductID: RemoteProductConfig? = null
         private lateinit var instance: EztApplication
         private var templateRepository: TemplateRepository? = null
         private var templateJob: Job? = null
@@ -36,9 +40,10 @@ open class EztApplication : Application() {
         FirebaseApp.initializeApp(this@EztApplication)
         PurchaseUtils.init(this@EztApplication)
         initFirebaseRemoteConfig()
-        JwtPayWall.jwtToken(instance)
+        jwtToken(instance)
         loadTemplateData()
         PurchaseUtils.checkFreeTrial()
+        logD("TANHXXXX =>>>>> accessToken:${accessToken}")
     }
 
     private fun loadTemplateData() {
@@ -46,32 +51,42 @@ open class EztApplication : Application() {
 
         templateJob = templateScope.launch {
             try {
-
-                templateRepository?.getTemplatesByKeys(listOf(packageName))?.collect { result ->
+                templateRepository?.getTemplatesByPackageId(packageName)?.collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
-                            val templateResponse = result.data.data.find { it.params == packageName }
-                            templateResponse?.let { template ->
-                                TemplateDataManager.saveTemplateData(packageName, template.data)
-                                template.data.forEach { templateData ->
-                                    templateData.templates.forEach {
-                                        Log.d(EZT_Purchase, "observeViewModel: Template URL:${it.url}")
+                            try {
+                                result.data.data?.params?.forEach { param ->
+                                    param.firebaseValues.forEach { firebaseValue ->
+                                        firebaseValue.templates.forEach { template ->
+                                            logd(
+                                                "FirebaseValue: ${firebaseValue.value}, Template: ${template.name}, URL: ${template.url}",
+                                                DataTemplate
+                                            )
+                                        }
                                     }
                                 }
-                                cleanupTemplateResources()
+                                result.data.data?.let {
+                                    TemplateDataManager.saveTemplateDataAll(packageName, it)
+                                }
+                            } catch (e: Exception) {
+                                logd("Error processing template data: ${e.message}", DataTemplate)
+
                             }
-                        }
-                        is ApiResult.Error -> {
-                            logD("TANHXXXX =>>>>> Error loading templates: ${result.message}")
                             cleanupTemplateResources()
                         }
+
+                        is ApiResult.Error -> {
+                            logd("Error loading templates: ${result.message}", DataTemplate)
+                            cleanupTemplateResources()
+                        }
+
                         is ApiResult.Loading -> {
-                            logD("TANHXXXX =>>>>> Loading templates...")
+                            logd("Loading templates...", DataTemplate)
                         }
                     }
                 }
             } catch (e: Exception) {
-                logD("TANHXXXX =>>>>> Exception loading templates: ${e.message}")
+                logd("Exception loading templates", DataTemplate)
                 cleanupTemplateResources()
             }
         }
@@ -85,8 +100,9 @@ open class EztApplication : Application() {
 
     private fun setupPurchaseProducts() {
         val remoteConfig = getRemoteProductConfig()
+        configIAP = remoteConfig
         infoProductID = remoteConfig
-        producFreetrial = remoteConfig.freeTrial.toString()
+        producFreetrial = remoteConfig.freeTrial
 
         PurchaseUtils.Builder()
             .fromRemoteConfig(remoteConfig)
@@ -131,19 +147,7 @@ open class EztApplication : Application() {
         }
     }
 
-     open fun getDefaultProductConfig(): RemoteProductConfig {
-        return RemoteProductConfig(
-            subscriptions = listOf("product_id_yearly", "product_id_1monthly", "product_id_6monthly"),
-            oneTimeProducts = listOf("product_id_lifetime"),
-            consumableProducts = emptyList(),
-            removeAds = listOf(
-                "product_id_yearly",
-                "product_id_1monthly",
-                "product_id_6monthly",
-                "product_id_lifetime"
-            )
-        )
-    }
+    abstract fun getDefaultProductConfig(): RemoteProductConfig
 }
 
 fun PurchaseUtils.Builder.fromRemoteConfig(config: RemoteProductConfig): PurchaseUtils.Builder {

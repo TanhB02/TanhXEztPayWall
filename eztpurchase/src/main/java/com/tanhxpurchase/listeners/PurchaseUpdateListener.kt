@@ -1,6 +1,6 @@
 package com.tanhxpurchase.listeners
 
-import com.tanhxpurchase.model.Purchase
+import com.tanhxpurchase.model.iap.Purchase
 
 interface PurchaseUpdateListener {
     fun onPurchaseSuccess(purchases: Purchase) { }

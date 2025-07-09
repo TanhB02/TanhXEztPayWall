@@ -1,0 +1,260 @@
+com.lib.tanhx_purchase.BR:
+    public void <init>()
+com.lib.tanhx_purchase.BuildConfig
+com.lib.tanhx_purchase.DataBinderMapperImpl$InnerBrLookup:
+    private void <init>()
+com.lib.tanhx_purchase.DataBinderMapperImpl$InnerLayoutIdLookup:
+    private void <init>()
+com.lib.tanhx_purchase.DataBinderMapperImpl:
+    private static final int LAYOUT_BOTTOMSHEETPREMIUM
+com.lib.tanhx_purchase.DataBindingTriggerClass
+com.lib.tanhx_purchase.databinding.BottomSheetPremiumBinding:
+    public com.tanhxpurchase.activity.IAPWebViewViewModel getViewModel()
+com.tanhxpurchase.EztApplication$Companion:
+    public final com.tanhxpurchase.model.iap.RemoteProductConfig getInfoProductID()
+    public final void setInfoProductID(com.tanhxpurchase.model.iap.RemoteProductConfig)
+com.tanhxpurchase.PurchaseUtils$Builder:
+    public final varargs com.tanhxpurchase.PurchaseUtils$Builder consumableProducts(java.lang.String[])
+    public final varargs com.tanhxpurchase.PurchaseUtils$Builder oneTimeProducts(java.lang.String[])
+    public final varargs com.tanhxpurchase.PurchaseUtils$Builder removeAds(java.lang.String[])
+    public final varargs com.tanhxpurchase.PurchaseUtils$Builder subscriptions(java.lang.String[])
+com.tanhxpurchase.activity.IAPWebViewActivity$Companion:
+    public static synthetic void start$default(com.tanhxpurchase.activity.IAPWebViewActivity$Companion,android.app.Activity,java.lang.String,java.lang.String,kotlin.jvm.functions.Function0,kotlin.jvm.functions.Function0,kotlin.jvm.functions.Function0,int,java.lang.Object)
+com.tanhxpurchase.billing.BillingResponse:
+    private final int code
+    private synthetic void <init>(int)
+    public static final synthetic com.tanhxpurchase.billing.BillingResponse box-impl(int)
+    public boolean equals(java.lang.Object)
+    public static boolean equals-impl(int,java.lang.Object)
+    public static final boolean equals-impl0(int,int)
+    public final int getCode()
+    public int hashCode()
+    public static int hashCode-impl(int)
+    public java.lang.String toString()
+    public static java.lang.String toString-impl(int)
+    public final synthetic int unbox-impl()
+com.tanhxpurchase.billing.BillingService$addOneTimeProductId$1$1
+com.tanhxpurchase.billing.BillingService$addOneTimeProductId$1
+com.tanhxpurchase.billing.BillingService$addSubscriptionId$1$1
+com.tanhxpurchase.billing.BillingService$addSubscriptionId$1
+com.tanhxpurchase.billing.BillingService:
+    public final void addOneTimeProductId(java.util.List)
+    public final void addSubscriptionId(java.util.List)
+    public static final com.tanhxpurchase.billing.BillingService getInstance$eztpurchase_release()
+    public final kotlin.jvm.functions.Function0 getOnInitBillingFinish$eztpurchase_release()
+    static synthetic void logDebug$default(com.tanhxpurchase.billing.BillingService,java.lang.String,int,java.lang.Object)
+com.tanhxpurchase.hawk.EzTechHawk:
+    private static final java.lang.String ACCESS_TOKEN
+    private static final java.lang.String AUTHEN_PAYWALL
+    private static final java.lang.String AUTHEN_TRACKING
+    private static final java.lang.String COUNTRY_CODE
+    private static final java.lang.String DARK_MODE
+    private static final java.lang.String IS_FREE_TRIAL
+    private static final java.lang.String PRIVACY_POLICY
+    private static final java.lang.String PRODUCT_FREE_TRIAL
+    private static final java.lang.String TERMS_OF_SERVICE
+    private static final java.lang.String TIMEOUT_PAYWALL
+    public final void setPrivacyPolicy(java.lang.String)
+    public final void setTermsOfService(java.lang.String)
+    public final void setTimeOutPayWall(long)
+com.tanhxpurchase.network.TemplateApiService$DefaultImpls:
+    public static synthetic java.lang.Object getTemplatesByKey$default(com.tanhxpurchase.network.TemplateApiService,java.lang.String,java.lang.String,java.lang.String,com.tanhxpurchase.model.template.GetTemplateRequest,kotlin.coroutines.Continuation,int,java.lang.Object)
+com.tanhxpurchase.network.TemplateApiService:
+    public abstract java.lang.Object getTemplatesByKey(java.lang.String,java.lang.String,java.lang.String,com.tanhxpurchase.model.template.GetTemplateRequest,kotlin.coroutines.Continuation)
+com.tanhxpurchase.repository.TemplateRepository$getTemplatesByKeys$1
+com.tanhxpurchase.repository.TemplateRepository:
+    public void <init>()
+    public final kotlinx.coroutines.flow.Flow getTemplatesByKeys(java.util.List)
+com.tanhxpurchase.util.ApiResult$Error:
+    public final java.lang.String component1()
+    public final com.tanhxpurchase.util.ApiResult$Error copy(java.lang.String)
+    public static synthetic com.tanhxpurchase.util.ApiResult$Error copy$default(com.tanhxpurchase.util.ApiResult$Error,java.lang.String,int,java.lang.Object)
+com.tanhxpurchase.util.ApiResult$Success:
+    public final java.lang.Object component1()
+    public final com.tanhxpurchase.util.ApiResult$Success copy(java.lang.Object)
+    public static synthetic com.tanhxpurchase.util.ApiResult$Success copy$default(com.tanhxpurchase.util.ApiResult$Success,java.lang.Object,int,java.lang.Object)
+com.tanhxpurchase.util.JwtPayWall:
+    private static final java.lang.String AES_ALGORITHM
+    private static final java.lang.String AES_TRANSFORMATION
+    private static final java.lang.String DEVICE_SECRET_KEY
+com.tanhxpurchase.util.ProductDetailsExtKt:
+    public static final void logFirebaseEvent(java.lang.String)
+com.tanhxpurchase.util.TemplateDataManager:
+    public final com.tanhxpurchase.model.template.TrackingEventRequest createTrackingEventFromUrl(java.lang.String,int,java.lang.String)
+    public static synthetic com.tanhxpurchase.model.template.TrackingEventRequest createTrackingEventFromUrl$default(com.tanhxpurchase.util.TemplateDataManager,java.lang.String,int,java.lang.String,int,java.lang.Object)
+    private final java.lang.String extractUrlPath(java.lang.String)
+    public final java.util.List getAllUrls()
+    private final boolean isUrlMatchFixed(java.lang.String,java.lang.String)
+    private final java.lang.String normalizeUrl(java.lang.String)
+com.tanhxpurchase.util.UtilKt:
+    public static final boolean getEnableLog()
+    public static final void setEnableLog(boolean)
+    public static final void setMarginTopDp(android.view.View,int)
+    public static final varargs void setTextRes(android.widget.TextView,int,java.lang.Object[])
+    public static final void toInvisible(android.view.View)
+com.tanhxpurchase.util.clickeffect.ClickShrinkEffectKt:
+    private static final long DURATION_ANIMATION
+    private static final float SHRINK_VALUE
+com.tanhxpurchase.util.clickeffect.OnSingleClickListenerKt:
+    private static final long DURATION_CLICK
+androidx.databinding.library.baseAdapters.BR:
+    static void <clinit>()
+com.lib.tanhx_purchase.BR
+com.lib.tanhx_purchase.databinding.ActivityIapWebViewBinding:
+    public final androidx.cardview.widget.CardView ctl1
+    public final androidx.appcompat.widget.LinearLayoutCompat llPrices
+    public final androidx.appcompat.widget.LinearLayoutCompat lnBottom
+    public final com.airbnb.lottie.LottieAnimationView lottieAnimation0
+    public final com.airbnb.lottie.LottieAnimationView lottieAnimation1
+    public final androidx.appcompat.widget.AppCompatTextView tvAllSever
+    public final androidx.appcompat.widget.AppCompatTextView tvEnjoyAdFree
+    public final androidx.appcompat.widget.AppCompatTextView tvHighSpeed
+    public final androidx.appcompat.widget.AppCompatTextView tvRemoveAds
+    public static android.widget.FrameLayout getRoot()
+com.lib.tanhx_purchase.databinding.BottomSheetPremiumBinding:
+    public com.tanhxpurchase.activity.IAPWebViewViewModel mViewModel
+    public abstract void setViewModel()
+com.lib.tanhx_purchase.databinding.BottomSheetPremiumBindingImpl:
+    public final android.widget.LinearLayout mboundView0
+    public static final androidx.databinding.ViewDataBinding$IncludedLayouts sIncludes
+    public final void setViewModel()
+com.lib.tanhx_purchase.databinding.DialogPremiumBinding:
+    public static androidx.appcompat.widget.LinearLayoutCompat getRoot()
+com.lib.tanhx_purchase.databinding.ItemIapBinding:
+    public final androidx.appcompat.widget.LinearLayoutCompat llCenter
+    public final androidx.appcompat.widget.LinearLayoutCompat llRight
+    public static androidx.constraintlayout.widget.ConstraintLayout getRoot()
+com.tanhxpurchase.EztApplication$loadTemplateData$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.EztApplicationKt
+com.tanhxpurchase.PurchaseUtils$Builder:
+    public static void build()
+    public static com.tanhxpurchase.PurchaseUtils$Builder consumableProducts()
+    public static com.tanhxpurchase.PurchaseUtils$Builder oneTimeProducts()
+    public static com.tanhxpurchase.PurchaseUtils$Builder removeAds()
+    public static com.tanhxpurchase.PurchaseUtils$Builder subscriptions()
+com.tanhxpurchase.PurchaseUtils$onInitBillingFinish$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.TrackingUtils
+com.tanhxpurchase.activity.IAPWebViewActivity$Companion$start$1:
+    public final void onCloseClicked()
+    public final void onPurchaseSuccess()
+    public final void onReceivedError()
+com.tanhxpurchase.activity.IAPWebViewActivity$Companion:
+    public static void start()
+com.tanhxpurchase.activity.IAPWebViewActivity$IAPCallback:
+    public abstract void onCloseClicked()
+    public abstract void onPurchaseSuccess()
+    public abstract void onReceivedError()
+com.tanhxpurchase.activity.IAPWebViewActivity$TimeOutWithNoPrice$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.activity.IAPWebViewActivity$onUserClickListener$1$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.activity.IAPWebViewActivity$onUserClickListener$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.activity.IAPWebViewActivity$special$$inlined$viewModels$default$1:
+    public static androidx.lifecycle.ViewModelProvider$Factory invoke()
+com.tanhxpurchase.activity.IAPWebViewActivity$special$$inlined$viewModels$default$2:
+    public static androidx.lifecycle.ViewModelStore invoke()
+com.tanhxpurchase.activity.IAPWebViewActivity$special$$inlined$viewModels$default$3:
+    public final synthetic kotlin.jvm.functions.Function0 $extrasProducer
+    public static androidx.lifecycle.viewmodel.CreationExtras invoke()
+com.tanhxpurchase.billing.BillingResponse
+com.tanhxpurchase.billing.BillingService$Companion
+com.tanhxpurchase.billing.BillingService$addAllSubsAndProduct$1$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService$addAllSubsAndProduct$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService$onBillingSetupFinished$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService$onPurchasesUpdated$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService$queryProductDetails$3:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService$queryPurchases$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService$retryConnection$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.billing.BillingService:
+    public static final com.tanhxpurchase.billing.BillingService$Companion Companion
+    public static void addAllSubsAndProduct()
+    public static void addPurchaseUpdateListener()
+    public static boolean checkPurchased()
+    public static java.lang.String getCurrency()
+    public static java.lang.String getDiscountPrice()
+    public static kotlinx.coroutines.flow.StateFlow getOwnedProducts()
+    public static java.lang.String getPrice()
+    public static float getPriceWithoutCurrency()
+    public static int getRetryCount()
+    public static void initBillingClient()
+    public static boolean isRemoveAds()
+    public final void launchBillingFlow(android.app.Activity,com.android.billingclient.api.ProductDetails,java.lang.String)
+    public static void logDebug()
+    public final void retryConnection()
+    public static void setListRemoveAdsId()
+    public static void setOnInitBillingFinish$eztpurchase_release()
+    public static void setRetryCount()
+    public final void startConnection()
+com.tanhxpurchase.dialog.PremiumBottomSheet$TimeOutWithNoPrice$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.dialog.PremiumBottomSheet$onUserClickListener$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.dialog.PremiumDialog$1:
+    public static com.lib.tanhx_purchase.databinding.DialogPremiumBinding invoke()
+com.tanhxpurchase.dialog.PremiumDialog$TimeOutWithNoPrice$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.dialog.PremiumDialog$dissMiss$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.dialog.PremiumDialog$onUserClickListener$1:
+    public int label
+    public static java.lang.Object invoke()
+com.tanhxpurchase.hawk.EzTechHawk
+com.tanhxpurchase.listeners.PurchaseUpdateListener$DefaultImpls
+com.tanhxpurchase.network.NetworkModule:
+    public static final com.tanhxpurchase.network.NetworkModule INSTANCE
+    public void <init>()
+    public static com.tanhxpurchase.network.TemplateApiService getTemplateApiService()
+com.tanhxpurchase.network.TemplateApiService$DefaultImpls
+com.tanhxpurchase.repository.TemplateRepository$getTemplatesByPackageId$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.repository.TemplateRepository$logIAPPurchase$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.repository.TemplateRepository$logTrackingEvent$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.repository.TemplateRepository$registerDevice$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.repository.TemplateRepository:
+    public static kotlinx.coroutines.flow.Flow getTemplatesByPackageId()
+    public static kotlinx.coroutines.flow.Flow logIAPPurchase()
+    public static kotlinx.coroutines.flow.Flow logTrackingEvent()
+    public static kotlinx.coroutines.flow.Flow registerDevice()
+com.tanhxpurchase.util.ApiResult$Error:
+    public static java.lang.String getMessage()
+com.tanhxpurchase.util.ApiResult$Success:
+    public static java.lang.Object getData()
+com.tanhxpurchase.util.JwtPayWall:
+    public static java.lang.String generateJWT()
+    public static byte[] normalizeKey()
+com.tanhxpurchase.util.ProductDetailsExtKt
+com.tanhxpurchase.util.TemplateDataManager:
+    public static final com.tanhxpurchase.util.TemplateDataManager INSTANCE
+    public void <init>()
+    public static java.lang.String getTemplateUrlByName()
+    public static void saveTemplateDataAll()
+com.tanhxpurchase.util.UtilKt$setupWebViewClientWithTimeout$1$onPageStarted$1:
+    public static java.lang.Object invoke()
+com.tanhxpurchase.util.UtilKt:
+    public static boolean enableLog
+    static void <clinit>()
+    public static final int dpToPx(android.content.Context,int)
+    public static synthetic void logd$default(java.lang.String)
+    public static final void setTextRes(androidx.appcompat.widget.AppCompatTextView,int)
+    public static final void setupWebViewClientWithTimeout(android.webkit.WebView,androidx.lifecycle.LifecycleCoroutineScope,kotlin.jvm.functions.Function2,kotlin.jvm.functions.Function0)
+com.tanhxpurchase.util.clickeffect.ClickShrinkEffectKt:
+    public static synthetic void setOnClickShrinkEffectListener$default(android.view.View,android.view.View$OnClickListener)

@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.lib.tanhx_purchase.R
 import com.lib.tanhx_purchase.databinding.ItemIapBinding
-import com.tanhxpurchase.Base_Plan_Id_1Monthly
-import com.tanhxpurchase.Base_Plan_Id_6Monthly
-import com.tanhxpurchase.Base_Plan_Id_Yearly
-import com.tanhxpurchase.Base_Plan_Id_Yearly_Trial
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_1Monthly
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_6Monthly
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_Yearly
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_Yearly_Trial
 import com.tanhxpurchase.PurchaseUtils
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
 import com.tanhxpurchase.util.dpToPx
-import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.toGone
 import com.tanhxpurchase.util.toVisible
 

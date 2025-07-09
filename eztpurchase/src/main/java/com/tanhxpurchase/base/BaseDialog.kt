@@ -8,6 +8,7 @@ import android.view.View
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.viewbinding.ViewBinding
+import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 
 abstract class BaseDialog<B: ViewBinding>(
     context: Context,
@@ -26,6 +27,7 @@ abstract class BaseDialog<B: ViewBinding>(
         setContentView(binding.root)
         initViews(binding)
         initActions(binding)
+        enqueueDeviceRegistration(context.applicationContext)
     }
 
     protected fun hideKeyboard(view: View) = runCatching {

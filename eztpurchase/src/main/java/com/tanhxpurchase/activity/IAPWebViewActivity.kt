@@ -8,28 +8,33 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.lib.tanhx_purchase.R
 import com.lib.tanhx_purchase.databinding.ActivityIapWebViewBinding
-import com.tanhxpurchase.Android
-import com.tanhxpurchase.Base_Plan_Id_1Monthly
-import com.tanhxpurchase.Base_Plan_Id_6Monthly
-import com.tanhxpurchase.Base_Plan_Id_Yearly
-import com.tanhxpurchase.Base_Plan_Id_Yearly_Trial
-import com.tanhxpurchase.CLOSE
-import com.tanhxpurchase.PAYLOAD_RECEIVED
-import com.tanhxpurchase.POLICY
-import com.tanhxpurchase.Privacy_Policy
+import com.tanhxpurchase.ConstantsPurchase.Android
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_1Monthly
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_6Monthly
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_Yearly
+import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_Yearly_Trial
+import com.tanhxpurchase.ConstantsPurchase.CLOSE
+import com.tanhxpurchase.ConstantsPurchase.PAYLOAD_RECEIVED
+import com.tanhxpurchase.ConstantsPurchase.POLICY
 import com.tanhxpurchase.PurchaseUtils
-import com.tanhxpurchase.RESTORE
-import com.tanhxpurchase.Restore
-import com.tanhxpurchase.TERMS
-import com.tanhxpurchase.Terms
-import com.tanhxpurchase.TimeOut_PayWall_No_Price
+import com.tanhxpurchase.PurchaseUtils.getPayWall
+import com.tanhxpurchase.ConstantsPurchase.RESTORE
+import com.tanhxpurchase.ConstantsPurchase.Restore
+import com.tanhxpurchase.ConstantsPurchase.TERMS
+import com.tanhxpurchase.TrackingUtils.trackingBuy
+import com.tanhxpurchase.TrackingUtils.trackingCloseScreen
+import com.tanhxpurchase.TrackingUtils.trackingShowScreen
 import com.tanhxpurchase.base.BaseActivity
 import com.tanhxpurchase.customview.ItemIAPView
 import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.privacyPolicy
+import com.tanhxpurchase.hawk.EzTechHawk.termsOfService
+import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
 import com.tanhxpurchase.util.clickeffect.setOnClickShrinkEffectListener
 import com.tanhxpurchase.util.configureWebViewSettings
+import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.util.openLink
 import com.tanhxpurchase.util.setTextHtml
 import com.tanhxpurchase.util.setTextRes
@@ -47,7 +52,9 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     private var currentWebView: WebView? = null
     private var injectionScript: String? = null
     private var productIDSelect: String = Base_Plan_Id_Yearly
-    private var urlWeb: String = ""
+    private lateinit var urlWeb: String
+    private lateinit var screenName: String
+    private lateinit var isFromTo: String
     private var jobTimeOut: Job? = null
 
     interface IAPCallback {
@@ -58,10 +65,12 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
 
     companion object {
         private var iapCallback: IAPCallback? = null
-        const val URL = "URL"
+        private const val SCREEN_NAME = "screen_name"
+        private const val IS_FROM_TO = "is_from_to"
         fun start(
             activity: Activity,
-            baseUrl: String,
+            screenName: String,
+            isFromTo: String,
             onPurchaseSuccess: (() -> Unit)? = null,
             onReceivedError: (() -> Unit)? = null,
             onCloseClicked: (() -> Unit)? = null,
@@ -82,7 +91,8 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             }
 
             Intent(activity, IAPWebViewActivity::class.java).apply {
-                putExtra(URL, baseUrl)
+                putExtra(SCREEN_NAME, screenName)
+                putExtra(IS_FROM_TO, isFromTo)
                 activity.startActivity(this)
             }
         }
@@ -99,18 +109,32 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
 
     private fun TimeOutWithNoPrice() {
         jobTimeOut = lifecycleScope.launch {
-            delay(TimeOut_PayWall_No_Price)
-            onReceivedError()
+            delay(timeOutPayWall)
+            if (!isDestroyed && !isFinishing) {
+                onFailureCallbackWithError()
+            }
         }
     }
 
 
     override fun initView() {
-        urlWeb = intent.getStringExtra(URL).toString()
+        shineAnimation(binding.shine)
+        screenName = intent.getStringExtra(SCREEN_NAME).toString()
+        isFromTo = intent.getStringExtra(IS_FROM_TO).toString()
+        urlWeb = getPayWall(packageName,screenName)
+        if (urlWeb.isBlank() || urlWeb == "null") {
+            onFailureCallbackWithError()
+            return
+        }
         injectionScript = viewModel.createInjectionScript(this@IAPWebViewActivity)
         setupWebView()
-        shineAnimation(binding.shine)
-        currentWebView?.loadUrl(urlWeb)
+        try {
+            currentWebView?.loadUrl(urlWeb)
+        } catch (e: Exception) {
+            onFailureCallbackWithError()
+            return
+        }
+
         if (PurchaseUtils.checkFreeTrial()) {
             productIDSelect = Base_Plan_Id_Yearly_Trial
             binding.tvContinue.setTextRes(R.string.start_7_day_free_trial)
@@ -120,6 +144,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             )
         }
         TimeOutWithNoPrice()
+        trackingShowScreen(this@IAPWebViewActivity, screenName,isFromTo)
     }
 
     override fun onResume() {
@@ -131,11 +156,15 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             currentWebView = createWebView()
                 .apply {
                     setupWebViewClientWithTimeout(lifecycleScope, onPageFinished = { webView, url ->
-                        injectionScript?.let {
-                            evaluateJavascript(it, null)
+                        try {
+                            if (injectionScript != null && !isDestroyed && !isFinishing) {
+                                evaluateJavascript(injectionScript!!, null)
+                            }
+                        } catch (e: Exception) {
+                            logd("TANHXXXX => Error evaluating JavaScript: ${e.message}")
                         }
                     }, onReceivedError = {
-                        onReceivedError()
+                        onFailureCallbackWithError()
                     })
                 }
             binding.webViewContainer.addView(currentWebView)
@@ -154,25 +183,23 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     }
 
     private fun onFailureCallbackWithError() {
-        if (!onFailureCallback()) {
-            iapCallback?.onReceivedError()
+        if (isDestroyed || isFinishing) return
+        iapCallback?.onReceivedError()
+        if (onFailureCallback()) {
+            binding.webViewContainer.toGone()
+            binding.ctBackUp.toVisible()
+            binding.ctLoadding.toGone()
+        } else {
             finish()
-            return
         }
     }
 
-    private fun onReceivedError() {
-        onFailureCallbackWithError()
-        binding.webViewContainer.toGone()
-        binding.ctBackUp.toVisible()
-        binding.ctLoadding.toGone()
-
-    }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun createWebView(): WebView {
         return try {
-            WebView(this).apply {
+            val webView = WebView(this)
+            webView.apply {
                 configureWebViewSettings(this)
                 addJavascriptInterface(IAPWebInterface(this@IAPWebViewActivity), Android)
             }
@@ -186,23 +213,27 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
 
     // @formatter:off
     override fun onUserClickListener(data: String) {
+        if (isDestroyed || isFinishing) return
         lifecycleScope.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
-                CLOSE -> { handleCloseAction() }
-                POLICY -> { openLink(Privacy_Policy) }
-                TERMS -> { openLink(Terms) }
+                CLOSE -> {
+                    handleCloseAction()
+                }
+                POLICY -> { openLink(privacyPolicy) }
+                TERMS -> { openLink(termsOfService) }
                 RESTORE -> { openLink(Restore) }
                 PAYLOAD_RECEIVED ->{
                     lifecycleScope.launch(Dispatchers.Main) {
-                        jobTimeOut?.cancel()
-                        binding.webViewContainer.toVisible()
-                        binding.ctBackUp.toGone()
-                        binding.ctLoadding.toGone()
+                            jobTimeOut?.cancel()
+                            binding.webViewContainer.toVisible()
+                            binding.ctBackUp.toGone()
+                            binding.ctLoadding.toGone()
                     }
                 }
                 else -> {
                     productIDSelect = data
-                    buyProduct(productIDSelect.toString())
+                    trackingBuy(this@IAPWebViewActivity,screenName,productIDSelect,isFromTo)
+                    buyProduct(productIDSelect)
                 }
             }
         }
@@ -215,12 +246,15 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     }
 
     private fun buyProduct(producID: String) {
+        if (isDestroyed || isFinishing) return
         PurchaseUtils.buy(
             this,
             producID,
             onPurchaseSuccess = { purchase ->
-                iapCallback?.onPurchaseSuccess()
-                finish()
+                if (!isDestroyed && !isFinishing) {
+                    iapCallback?.onPurchaseSuccess()
+                    finish()
+                }
             },
             onPurchaseFailure = { code, errorMsg ->
 
@@ -252,11 +286,11 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             }
 
             tvPrivacyPolicy.setOnClickShrinkEffectListener {
-                openLink(Privacy_Policy)
+                openLink(privacyPolicy)
             }
 
             tvTermsOfUse.setOnClickShrinkEffectListener {
-                openLink(Terms)
+                openLink(termsOfService)
             }
 
             tvRestore.setOnClickShrinkEffectListener {
@@ -279,13 +313,16 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             }
 
             clContinue.setOnClickShrinkEffectListener {
-                buyProduct(productIDSelect.toString())
+                buyProduct(productIDSelect)
             }
         }
     }
 
     private fun handleCloseAction() {
-        iapCallback?.onCloseClicked()
+        if (!isDestroyed && !isFinishing) {
+            iapCallback?.onCloseClicked()
+        }
+        trackingCloseScreen(this, screenName, isFromTo)
         finish()
     }
 

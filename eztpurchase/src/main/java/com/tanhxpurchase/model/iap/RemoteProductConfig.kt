@@ -1,4 +1,4 @@
-package com.tanhxpurchase.model
+package com.tanhxpurchase.model.iap
 
 import com.google.gson.annotations.SerializedName
 

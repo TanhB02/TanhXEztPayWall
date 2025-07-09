@@ -5,20 +5,22 @@ import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
 import com.tanhxpurchase.activity.IAPWebViewActivity
 import com.tanhxpurchase.billing.BillingService
-import com.tanhxpurchase.dialog.DialogPremium
+import com.tanhxpurchase.dialog.PremiumDialog
 import com.tanhxpurchase.dialog.PremiumBottomSheet
 import com.tanhxpurchase.listeners.PurchaseUpdateListener
-import com.tanhxpurchase.model.Purchase
-import com.tanhxpurchase.sharepreference.EzTechPreferences
-import com.tanhxpurchase.sharepreference.EzTechPreferences.countryCode
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isDarkMode
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
-import com.tanhxpurchase.util.JwtPayWall
-import com.tanhxpurchase.util.TemplateDataManager.getTemplatesByValue
+import com.tanhxpurchase.model.iap.Purchase
+import com.tanhxpurchase.hawk.EzTechHawk.countryCode
+import com.tanhxpurchase.hawk.EzTechHawk.isDarkMode
+import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
+import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logFirebaseEvent
+import com.tanhxpurchase.util.logd
+import com.tanhxpurchase.worker.WokerMananer.enqueueIAPLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -50,7 +52,6 @@ object PurchaseUtils : PurchaseUpdateListener {
     private var isAvailable = false
 
     fun init(context: Context) {
-        EzTechPreferences.init(context)
         billingService.initBillingClient(context)
     }
 
@@ -65,27 +66,20 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
-    fun showDialogPayWall(context: Context, lifecycleCoroutineScope: LifecycleCoroutineScope, url: String, onUpgradeNow: () -> Unit,watchAdsCallBack: () -> Unit, onFailure: () -> Unit) {
-        val dialog = DialogPremium(
+    fun showDialogPayWall(
+        context: Activity,
+        screenName : String,
+        isFromTo : String,
+        lifecycleCoroutineScope: LifecycleCoroutineScope,
+        onUpgradeNow: () -> Unit,
+        watchAdsCallBack: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val dialog = PremiumDialog(
             context = context,
             lifecycles = lifecycleCoroutineScope,
-            url = url,
-            onUpgradeCallback = {
-                onUpgradeNow()
-            },
-            watchAdsCallBack = {
-
-            },
-            onFailureCallback = {
-                onFailure()
-            }
-        )
-        dialog.show()
-    }
-
-    fun showBottomSheetPayWall(activity: FragmentActivity, url: String, onUpgradeNow: () -> Unit,watchAdsCallBack: () -> Unit, onFailure: () -> Unit) {
-        val bottomSheet = PremiumBottomSheet.newInstance(
-            url = url,
+            isFromTo = isFromTo,
+            screenName = screenName,
             onUpgradeCallback = {
                 onUpgradeNow()
             },
@@ -93,6 +87,32 @@ object PurchaseUtils : PurchaseUpdateListener {
                 watchAdsCallBack()
             },
             onFailureCallback = {
+                logd("showDialogPayWall onFailureCallback", EZT_Purchase)
+                onFailure()
+            }
+        )
+        dialog.show()
+    }
+
+    fun showBottomSheetPayWall(
+        activity: FragmentActivity,
+        screenName: String,
+        isFromTo : String,
+        onUpgradeNow: () -> Unit,
+        watchAdsCallBack: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val bottomSheet = PremiumBottomSheet.newInstance(
+            screenName = screenName,
+            isFromTo = isFromTo,
+            onUpgradeCallback = {
+                onUpgradeNow()
+            },
+            watchAdsCallBack = {
+                watchAdsCallBack()
+            },
+            onFailureCallback = {
+                logd("showBottomSheetPayWall onFailureCallback", EZT_Purchase)
                 onFailure()
             }
         )
@@ -100,13 +120,10 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
     fun getPayWall(packageName: String, keyConfig: String): String {
-        val urls = getTemplatesByValue(packageName, keyConfig).joinToString(separator = "\n") {
-            it.url
-        }
-
-        return urls
+        val url = getTemplateUrlByName(packageName, keyConfig)
+        logD("TANHXXXX =>>>>> url:${url}")
+        return url
     }
-
 
 
     fun addInitBillingFinishListener(listener: () -> Unit) {
@@ -124,6 +141,8 @@ object PurchaseUtils : PurchaseUpdateListener {
         mPurchaseUpdateListener = object : PurchaseUpdateListener {
             override fun onPurchaseSuccess(purchases: Purchase) {
                 onPurchaseSuccess(purchases)
+                logD("TANHXXXX =>>>>> purchases:${purchases}")
+                enqueueIAPLogging(activity.applicationContext, purchases)
             }
 
             override fun onPurchaseFailure(code: Int, errorMsg: String?) {
@@ -143,17 +162,21 @@ object PurchaseUtils : PurchaseUpdateListener {
 
     fun startActivityIAP(
         context: Activity,
-        urlWeb: String,
+        screenName: String,
+        isFromTo : String,
         onPurchaseSuccess: (() -> Unit)? = null,
         onReceivedError: (() -> Unit)? = null,
         onCloseClicked: (() -> Unit)? = null,
     ) {
         checkFreeTrial()
         IAPWebViewActivity.start(
-            context,
-            urlWeb,
+            activity = context,
+            screenName = screenName,
+            isFromTo = isFromTo,
             onPurchaseSuccess = onPurchaseSuccess,
-            onReceivedError = onReceivedError,
+            onReceivedError = {
+                onReceivedError?.invoke()
+            },
             onCloseClicked = onCloseClicked,
         )
     }
@@ -205,7 +228,7 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
     fun checkFreeTrial(): Boolean {
-        if (getPrice(EzTechPreferences.producFreetrial) != "") {
+        if (getPrice(producFreetrial) != "") {
             isFreeTrial = true
             return true
         } else {
