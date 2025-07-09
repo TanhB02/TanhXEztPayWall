@@ -28,11 +28,11 @@ import com.android.billingclient.api.ProductDetails
 import com.google.gson.Gson
 import com.lib.tanhx_purchase.BuildConfig
 import com.lib.tanhx_purchase.R
-import com.tanhxpurchase.EZT_Purchase
-import com.tanhxpurchase.TimeOut_PayWall
-import com.tanhxpurchase.sharepreference.EzTechPreferences.countryCode
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isDarkMode
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
+import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
+import com.tanhxpurchase.hawk.EzTechHawk.countryCode
+import com.tanhxpurchase.hawk.EzTechHawk.isDarkMode
+import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -159,7 +159,7 @@ fun WebView.setupWebViewClientWithTimeout(
             super.onPageStarted(view, url, favicon)
             loadJob?.cancel()
             loadJob = lifecycleScope.launch {
-                delay(TimeOut_PayWall)
+                delay(timeOutPayWall)
                 if (this.isActive) {
                     this@setupWebViewClientWithTimeout.stopLoading()
                     onReceivedError()

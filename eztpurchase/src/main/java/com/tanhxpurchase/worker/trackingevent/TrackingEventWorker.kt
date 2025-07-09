@@ -4,9 +4,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
-import com.orhanobut.hawk.Hawk
-import com.tanhxpurchase.ACCESS_TOKEN
-import com.tanhxpurchase.API
+import com.tanhxpurchase.ConstantsPurchase.API
+import com.tanhxpurchase.hawk.EzTechHawk.accessToken
 import com.tanhxpurchase.model.template.TrackingEventRequest
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
@@ -22,23 +21,15 @@ class TrackingEventWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            // ✅ Chỉ retry 1 lần duy nhất
-            if (runAttemptCount >= 1) {
-                logd("TrackingEventWorker: Already retried once, giving up", API)
-                return Result.failure()
-            }
+            if (runAttemptCount >= 1) return Result.failure()
 
             val eventJson = inputData.getString(KEY_EVENT_DATA)
-            if (eventJson.isNullOrEmpty()) {
-                logd("TrackingEventWorker: Event data not found", API)
-                return Result.failure()
-            }
+            if (eventJson.isNullOrEmpty()) return Result.failure()
 
             val trackingEvent = Gson().fromJson(eventJson, TrackingEventRequest::class.java)
 
             var finalResult: Result = Result.failure()
-            val accessToken = Hawk.get<String>(ACCESS_TOKEN, null)
-            if (accessToken.isNullOrEmpty()) {
+            if (accessToken.isEmpty()) {
                 logd("TrackingEventWorker: Access token not found, registering device first", API)
                 enqueueDeviceRegistration(applicationContext)
                 return Result.retry()

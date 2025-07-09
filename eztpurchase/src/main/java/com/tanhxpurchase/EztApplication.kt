@@ -6,22 +6,27 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import com.orhanobut.hawk.Hawk
-import com.tanhxpurchase.model.RemoteProductConfig
+import com.tanhxpurchase.ConstantsPurchase.CONFIG_IAP_KEY
+import com.tanhxpurchase.ConstantsPurchase.DataTemplate
+import com.tanhxpurchase.hawk.EzTechHawk.accessToken
+import com.tanhxpurchase.hawk.EzTechHawk.configIAP
+import com.tanhxpurchase.model.iap.RemoteProductConfig
 import com.tanhxpurchase.repository.TemplateRepository
-import com.tanhxpurchase.sharepreference.EzTechPreferences.producFreetrial
+import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
 import com.tanhxpurchase.util.ApiResult
 import com.tanhxpurchase.util.JwtPayWall.jwtToken
 import com.tanhxpurchase.util.TemplateDataManager
+import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-open class EztApplication : Application() {
+abstract class EztApplication : Application() {
 
     companion object {
-        var infoProductID : RemoteProductConfig? = null
+        var infoProductID: RemoteProductConfig? = null
         private lateinit var instance: EztApplication
         private var templateRepository: TemplateRepository? = null
         private var templateJob: Job? = null
@@ -38,6 +43,7 @@ open class EztApplication : Application() {
         jwtToken(instance)
         loadTemplateData()
         PurchaseUtils.checkFreeTrial()
+        logD("TANHXXXX =>>>>> accessToken:${accessToken}")
     }
 
     private fun loadTemplateData() {
@@ -52,7 +58,10 @@ open class EztApplication : Application() {
                                 result.data.data?.params?.forEach { param ->
                                     param.firebaseValues.forEach { firebaseValue ->
                                         firebaseValue.templates.forEach { template ->
-                                            logd("FirebaseValue: ${firebaseValue.value}, Template: ${template.name}, URL: ${template.url}", DataTemplate)
+                                            logd(
+                                                "FirebaseValue: ${firebaseValue.value}, Template: ${template.name}, URL: ${template.url}",
+                                                DataTemplate
+                                            )
                                         }
                                     }
                                 }
@@ -65,10 +74,12 @@ open class EztApplication : Application() {
                             }
                             cleanupTemplateResources()
                         }
+
                         is ApiResult.Error -> {
                             logd("Error loading templates: ${result.message}", DataTemplate)
                             cleanupTemplateResources()
                         }
+
                         is ApiResult.Loading -> {
                             logd("Loading templates...", DataTemplate)
                         }
@@ -89,9 +100,9 @@ open class EztApplication : Application() {
 
     private fun setupPurchaseProducts() {
         val remoteConfig = getRemoteProductConfig()
-        Hawk.put(CONFIG_IAP_KEY, remoteConfig)
+        configIAP = remoteConfig
         infoProductID = remoteConfig
-        producFreetrial = remoteConfig.freeTrial.toString()
+        producFreetrial = remoteConfig.freeTrial
 
         PurchaseUtils.Builder()
             .fromRemoteConfig(remoteConfig)
@@ -136,19 +147,7 @@ open class EztApplication : Application() {
         }
     }
 
-     open fun getDefaultProductConfig(): RemoteProductConfig {
-        return RemoteProductConfig(
-            subscriptions = listOf("product_id_yearly", "product_id_1monthly", "product_id_6monthly"),
-            oneTimeProducts = listOf("product_id_lifetime"),
-            consumableProducts = emptyList(),
-            removeAds = listOf(
-                "product_id_yearly",
-                "product_id_1monthly",
-                "product_id_6monthly",
-                "product_id_lifetime"
-            )
-        )
-    }
+    abstract fun getDefaultProductConfig(): RemoteProductConfig
 }
 
 fun PurchaseUtils.Builder.fromRemoteConfig(config: RemoteProductConfig): PurchaseUtils.Builder {

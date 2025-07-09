@@ -7,17 +7,9 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
-import com.orhanobut.hawk.Hawk
-import com.tanhxpurchase.CONFIG_IAP_KEY
-import com.tanhxpurchase.model.RemoteProductConfig
-import com.tanhxpurchase.repository.TemplateRepository
-import com.tanhxpurchase.sharepreference.EzTechPreferences
-import com.tanhxpurchase.util.ApiResult
-import com.tanhxpurchase.util.logD
+import com.tanhxpurchase.hawk.EzTechHawk
 import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
@@ -53,7 +45,7 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     }
 
     private fun updateLanguage() {
-        val locale = Locale(EzTechPreferences.countryCode, "")
+        val locale = Locale(EzTechHawk.countryCode, "")
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         config.setLayoutDirection(Locale("en"))

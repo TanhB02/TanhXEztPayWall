@@ -9,9 +9,8 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.gson.Gson
-import com.tanhxpurchase.API
-import com.tanhxpurchase.model.Purchase
-import com.tanhxpurchase.model.template.TrackingEventPayload
+import com.tanhxpurchase.ConstantsPurchase.API
+import com.tanhxpurchase.model.iap.Purchase
 import com.tanhxpurchase.model.template.TrackingEventRequest
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.paydone.IAPLoggingWorker
@@ -70,67 +69,11 @@ object WokerMananer {
         }
     }
 
-
-    //TODO fun này tracking close, show
-    fun enqueueTrackingEvent(
-        context: Context,
-        paywallConfigId: Int,
-        type: Int,
-        storeId: Int,
-        templateId: Int,
-        productId: String? = null
-    ) {
-        try {
-            logd("TrackingEventManager: Enqueuing tracking event - Type: $type, Template: $templateId", API)
-
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
-            val payload = if (productId != null) {
-                TrackingEventPayload(productId = productId)
-            } else null
-
-            val trackingEvent = TrackingEventRequest(
-                paywallConfigId = paywallConfigId,
-                type = type,
-                storeId = storeId,
-                templateId = templateId,
-                payload = payload
-            )
-
-            val eventJson = Gson().toJson(trackingEvent)
-            val inputData = Data.Builder()
-                .putString(TrackingEventWorker.KEY_EVENT_DATA, eventJson)
-                .build()
-
-            val workRequest = OneTimeWorkRequestBuilder<TrackingEventWorker>()
-                .setConstraints(constraints)
-                .setInputData(inputData)
-                .setBackoffCriteria(
-                    BackoffPolicy.EXPONENTIAL,
-                    10, TimeUnit.SECONDS
-                )
-                .build()
-
-            WorkManager.getInstance(context).enqueue(workRequest)
-
-            logd("TrackingEventManager: Tracking event work enqueued successfully", API)
-
-        } catch (e: Exception) {
-            logd("TrackingEventManager: Failed to enqueue tracking event work: ${e.message}", API)
-        }
-    }
-
-
-    //TODO fun này tracking click buy
     fun enqueueTrackingEvent(
         context: Context,
         trackingEvent: TrackingEventRequest
     ) {
         try {
-            logd("TrackingEventManager: Enqueuing tracking event with custom request", API)
-
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -150,9 +93,6 @@ object WokerMananer {
                 .build()
 
             WorkManager.getInstance(context).enqueue(workRequest)
-
-            logd("TrackingEventManager: Custom tracking event work enqueued successfully", API)
-
         } catch (e: Exception) {
             logd("TrackingEventManager: Failed to enqueue custom tracking event work: ${e.message}", API)
         }

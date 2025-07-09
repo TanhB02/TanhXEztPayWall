@@ -1,7 +1,6 @@
 package com.tanhxpurchase.model.template
 
-import com.android.billingclient.api.Purchase as BillingPurchase
-import com.tanhxpurchase.model.Purchase as CustomPurchase
+import com.tanhxpurchase.model.iap.Purchase as CustomPurchase
 import com.google.gson.annotations.SerializedName
 
 data class IAPPurchase(

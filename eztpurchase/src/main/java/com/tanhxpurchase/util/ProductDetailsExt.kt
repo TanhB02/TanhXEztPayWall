@@ -6,10 +6,10 @@ import com.android.billingclient.api.ProductDetails.OneTimePurchaseOfferDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import com.tanhxpurchase.model.BasePlanSubscription
-import com.tanhxpurchase.model.OfferSubscription
-import com.tanhxpurchase.model.OnetimeProduct
-import com.tanhxpurchase.model.Phase
+import com.tanhxpurchase.model.iap.BasePlanSubscription
+import com.tanhxpurchase.model.iap.OfferSubscription
+import com.tanhxpurchase.model.iap.OnetimeProduct
+import com.tanhxpurchase.model.iap.Phase
 
 /**
  * Find all offer in a product detail

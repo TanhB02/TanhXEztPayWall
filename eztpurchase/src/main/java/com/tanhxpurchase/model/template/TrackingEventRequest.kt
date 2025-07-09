@@ -17,7 +17,9 @@ data class TrackingEventRequest(
 
 data class TrackingEventPayload(
     @SerializedName("product_id")
-    val productId: String? = null
+    val productId: String? = null,
+    @SerializedName("is_from_to")
+    val isFromTo: String? = null
 )
 
 data class TrackingEventResponse(

@@ -5,21 +5,21 @@ import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
 import com.tanhxpurchase.activity.IAPWebViewActivity
 import com.tanhxpurchase.billing.BillingService
-import com.tanhxpurchase.dialog.DialogPremium
+import com.tanhxpurchase.dialog.PremiumDialog
 import com.tanhxpurchase.dialog.PremiumBottomSheet
 import com.tanhxpurchase.listeners.PurchaseUpdateListener
-import com.tanhxpurchase.model.Purchase
-import com.tanhxpurchase.sharepreference.EzTechPreferences
-import com.tanhxpurchase.sharepreference.EzTechPreferences.countryCode
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isDarkMode
-import com.tanhxpurchase.sharepreference.EzTechPreferences.isFreeTrial
+import com.tanhxpurchase.model.iap.Purchase
+import com.tanhxpurchase.hawk.EzTechHawk.countryCode
+import com.tanhxpurchase.hawk.EzTechHawk.isDarkMode
+import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
 import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.logd
-import com.tanhxpurchase.util.logeSelf
 import com.tanhxpurchase.worker.WokerMananer.enqueueIAPLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,6 @@ object PurchaseUtils : PurchaseUpdateListener {
     private var isAvailable = false
 
     fun init(context: Context) {
-        EzTechPreferences.init(context)
         billingService.initBillingClient(context)
     }
 
@@ -68,17 +67,19 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
     fun showDialogPayWall(
-        context: Context,
+        context: Activity,
+        screenName : String,
+        isFromTo : String,
         lifecycleCoroutineScope: LifecycleCoroutineScope,
-        url: String,
         onUpgradeNow: () -> Unit,
         watchAdsCallBack: () -> Unit,
         onFailure: () -> Unit
     ) {
-        val dialog = DialogPremium(
+        val dialog = PremiumDialog(
             context = context,
             lifecycles = lifecycleCoroutineScope,
-            url = url,
+            isFromTo = isFromTo,
+            screenName = screenName,
             onUpgradeCallback = {
                 onUpgradeNow()
             },
@@ -95,13 +96,15 @@ object PurchaseUtils : PurchaseUpdateListener {
 
     fun showBottomSheetPayWall(
         activity: FragmentActivity,
-        url: String,
+        screenName: String,
+        isFromTo : String,
         onUpgradeNow: () -> Unit,
         watchAdsCallBack: () -> Unit,
         onFailure: () -> Unit
     ) {
         val bottomSheet = PremiumBottomSheet.newInstance(
-            url = url,
+            screenName = screenName,
+            isFromTo = isFromTo,
             onUpgradeCallback = {
                 onUpgradeNow()
             },
@@ -159,19 +162,20 @@ object PurchaseUtils : PurchaseUpdateListener {
 
     fun startActivityIAP(
         context: Activity,
-        urlWeb: String,
+        screenName: String,
+        isFromTo : String,
         onPurchaseSuccess: (() -> Unit)? = null,
         onReceivedError: (() -> Unit)? = null,
         onCloseClicked: (() -> Unit)? = null,
     ) {
         checkFreeTrial()
         IAPWebViewActivity.start(
-            context,
-            urlWeb,
+            activity = context,
+            screenName = screenName,
+            isFromTo = isFromTo,
             onPurchaseSuccess = onPurchaseSuccess,
             onReceivedError = {
                 onReceivedError?.invoke()
-                logd("startActivityIAP onFailureCallback", EZT_Purchase)
             },
             onCloseClicked = onCloseClicked,
         )
@@ -224,7 +228,7 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
     fun checkFreeTrial(): Boolean {
-        if (getPrice(EzTechPreferences.producFreetrial) != "") {
+        if (getPrice(producFreetrial) != "") {
             isFreeTrial = true
             return true
         } else {

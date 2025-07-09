@@ -4,12 +4,10 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
-import com.orhanobut.hawk.Hawk
-import com.tanhxpurchase.ACCESS_TOKEN
-import com.tanhxpurchase.API
-import com.tanhxpurchase.CONFIG_IAP_KEY
-import com.tanhxpurchase.model.Purchase
-import com.tanhxpurchase.model.RemoteProductConfig
+import com.tanhxpurchase.ConstantsPurchase.API
+import com.tanhxpurchase.hawk.EzTechHawk.accessToken
+import com.tanhxpurchase.hawk.EzTechHawk.configIAP
+import com.tanhxpurchase.model.iap.Purchase
 import com.tanhxpurchase.model.template.IAPPurchase
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
@@ -20,33 +18,24 @@ class IAPLoggingWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
-
     private val repository = TemplateRepository()
 
     override suspend fun doWork(): Result {
         return try {
-            if (runAttemptCount >= 1) {
-                return Result.failure()
-            }
+            if (runAttemptCount >= 1) return Result.failure()
 
             val purchaseJson = inputData.getString(KEY_PURCHASE_DATA)
-            if (purchaseJson.isNullOrEmpty()) {
-                return Result.failure()
-            }
 
-            val purchase = Gson().fromJson(purchaseJson, Purchase::class.java)
-            val iapPurchase = IAPPurchase.from(purchase)
-            if (iapPurchase.payload?.productId in Hawk.get<RemoteProductConfig>(
-                    CONFIG_IAP_KEY,
-                    null
-                ).oneTimeProducts
-            ) {
-                iapPurchase.type = 2
-            }
+            if (purchaseJson.isNullOrEmpty()) return Result.failure()
+
+            val iapPurchase = IAPPurchase.from(Gson().fromJson(purchaseJson, Purchase::class.java))
+
+            if (configIAP == null) return Result.failure()
+
+            if (iapPurchase.payload?.productId in configIAP!!.oneTimeProducts) iapPurchase.type = 2
 
             var finalResult: Result = Result.failure()
-            val accessToken = Hawk.get<String>(ACCESS_TOKEN, null)
-            if (accessToken.isNullOrEmpty()) {
+            if (accessToken.isEmpty()) {
                 enqueueDeviceRegistration(applicationContext)
                 return Result.retry()
             }

@@ -3,7 +3,7 @@ package com.tanhxpurchase.worker.registerdevice
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.tanhxpurchase.API
+import com.tanhxpurchase.ConstantsPurchase.API
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
 import com.tanhxpurchase.util.logd
@@ -17,9 +17,7 @@ class DeviceRegistrationWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            if (runAttemptCount >= 1) {
-                return Result.failure()
-            }
+            if (runAttemptCount >= 1)  return Result.failure()
 
             var finalResult: Result = Result.failure()
 

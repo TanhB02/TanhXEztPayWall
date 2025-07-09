@@ -1,39 +1,44 @@
 package com.tanhxpurchase.dialog
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Activity
 import android.webkit.WebView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.lib.tanhx_purchase.R
 import com.lib.tanhx_purchase.databinding.DialogPremiumBinding
-import com.tanhxpurchase.Android
-import com.tanhxpurchase.CLOSE
-import com.tanhxpurchase.PAYLOAD_RECEIVED
-import com.tanhxpurchase.TimeOut_PayWall_No_Price
-import com.tanhxpurchase.UPGRADE
-import com.tanhxpurchase.WATCH_ADS
+import com.tanhxpurchase.ConstantsPurchase.Android
+import com.tanhxpurchase.ConstantsPurchase.CLOSE
+import com.tanhxpurchase.ConstantsPurchase.PAYLOAD_RECEIVED
+import com.tanhxpurchase.PurchaseUtils
+import com.tanhxpurchase.PurchaseUtils.getPayWall
+import com.tanhxpurchase.TrackingUtils.trackingBuy
+import com.tanhxpurchase.TrackingUtils.trackingCloseScreen
+import com.tanhxpurchase.TrackingUtils.trackingShowScreen
+import com.tanhxpurchase.TrackingUtils.trackingUpgrade
+import com.tanhxpurchase.TrackingUtils.trackingWatchAds
+import com.tanhxpurchase.ConstantsPurchase.UPGRADE
+import com.tanhxpurchase.ConstantsPurchase.WATCH_ADS
 import com.tanhxpurchase.activity.IAPWebViewViewModel
 import com.tanhxpurchase.base.BaseDialog
+import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
 import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.util.configureWebViewSettings
-import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
-import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.toGone
-import com.tanhxpurchase.util.toVisible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class DialogPremium(
-    context: Context,
+class PremiumDialog(
+    var context: Activity,
     var lifecycles: LifecycleCoroutineScope,
-    var url: String,
+    var screenName: String,
+    var isFromTo: String,
     val onUpgradeCallback: () -> Unit,
     val watchAdsCallBack: () -> Unit,
     val onFailureCallback: () -> Unit
@@ -42,6 +47,7 @@ class DialogPremium(
     R.style.DialogStyle,
     DialogPremiumBinding::inflate
 ), IAPWebViewCallback {
+    private lateinit var url : String
     private var jobTimeOut: Job? = null
     private var injectionScript: String? = null
     private val viewModel: IAPWebViewViewModel =
@@ -49,6 +55,7 @@ class DialogPremium(
     private var currentWebView: WebView? = null
     override fun initViews(binding: DialogPremiumBinding) {
         setCancelable(true)
+        url = getPayWall(context.packageName,keyConfig = screenName)
         if (url.isBlank()) {
             dissMiss()
             onFailureCallback()
@@ -67,20 +74,27 @@ class DialogPremium(
             }
             return
         }
-        
+        trackingShowScreen(context,screenName,isFromTo)
         TimeOutWithNoPrice()
     }
 
     private fun dissMiss(){
+
         lifecycles.launch {
             delay(100)
             dismiss()
         }
     }
 
+
+    override fun dismiss() {
+        super.dismiss()
+        trackingCloseScreen(context, screenName,isFromTo)
+    }
+
     private fun TimeOutWithNoPrice() {
         jobTimeOut = lifecycles.launch {
-            delay(TimeOut_PayWall_No_Price)
+            delay(timeOutPayWall)
             if (isShowing) {
                 dissMiss()
                 onFailureCallback()
@@ -119,7 +133,7 @@ class DialogPremium(
         return try {
             WebView(context).apply {
                 configureWebViewSettings(this)
-                addJavascriptInterface(IAPWebInterface(this@DialogPremium), Android)
+                addJavascriptInterface(IAPWebInterface(this@PremiumDialog), Android)
             }
         } catch (e: Exception) {
             logd("TANHXXXX => Error creating WebView in DialogPremium: ${e.message}")
@@ -138,13 +152,13 @@ class DialogPremium(
         lifecycles.launch(Dispatchers.Main) {
             when (data.replace("\"", "")) {
                 UPGRADE -> {
-                    logFirebaseEvent("action_click_upgrade_premium")
+                    trackingUpgrade(context, screenName,isFromTo)
                     dismiss()
                     onUpgradeCallback()
                 }
 
                 WATCH_ADS -> {
-                    logFirebaseEvent("action_click_watch_ads")
+                    trackingWatchAds(context, screenName,isFromTo)
                     dismiss()
                     watchAdsCallBack()
                 }
@@ -157,9 +171,29 @@ class DialogPremium(
                 CLOSE -> {
                     dismiss()
                 }
+
+                else -> {
+                    trackingBuy(context,screenName,data,isFromTo)
+                    buyProduct(data)
+                    dismiss()
+                }
             }
         }
     }
+
+    private fun buyProduct(producID: String) {
+        PurchaseUtils.buy(
+            context,
+            producID,
+            onPurchaseSuccess = { purchase ->
+                dismiss()
+            },
+            onPurchaseFailure = { code, errorMsg ->
+
+            }
+        )
+    }
+
 
 
 }

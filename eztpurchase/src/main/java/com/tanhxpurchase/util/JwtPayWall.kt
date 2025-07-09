@@ -10,11 +10,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.orhanobut.hawk.Hawk
-import com.tanhxpurchase.AUTHEN_PAYWALL
-import com.tanhxpurchase.AUTHEN_TRACKING
-import com.tanhxpurchase.TokenPayWall
-import org.json.JSONObject
+import com.tanhxpurchase.ConstantsPurchase.TokenPayWall
+import com.tanhxpurchase.hawk.EzTechHawk.authenPayWall
+import com.tanhxpurchase.hawk.EzTechHawk.authenTracking
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.Date
@@ -31,11 +29,9 @@ object JwtPayWall {
     @Throws(Exception::class)
 
     fun jwtToken(context: Context) {
-        val currentToken = Hawk.get<String>(AUTHEN_PAYWALL, null)
-
-        if (currentToken != null) {
+        if (authenPayWall != "") {
             try {
-                val payload = currentToken.split(".")[1]
+                val payload = authenPayWall.split(".")[1]
                 val decodedBytes = Base64.decode(payload, Base64.URL_SAFE or Base64.NO_WRAP)
                 val jsonString = String(decodedBytes)
                 val jsonObject = JsonParser.parseString(jsonString).asJsonObject
@@ -69,17 +65,16 @@ object JwtPayWall {
         }
         val newToken = generateJWT(jwtPayload.toString())
         logd("newtoken: $newToken", TokenPayWall)
-        Hawk.put(AUTHEN_PAYWALL, newToken)
+        authenPayWall = newToken ?: ""
     }
 
     fun generateTrackingToken(context: Context, packageId: String){
-        val currentToken = Hawk.get<String>(AUTHEN_TRACKING, null)
         val currentTime = System.currentTimeMillis() / 1000
         val tokenExpiration = 24 * 60 * 60 // 1 day in seconds
-        if (currentToken != null) {
-            logD("TokenPayWall : ${currentToken}")
+        if (authenTracking.isNotEmpty()) {
+            logD("TokenPayWall : ${authenTracking}")
             try {
-                val decryptedPayload = decodeOpenSsl(currentToken)
+                val decryptedPayload = decodeOpenSsl(authenTracking)
                 val jsonObject = JsonParser.parseString(decryptedPayload).asJsonObject
                 val tokenTime = jsonObject.get("time")?.asLong ?: 0L
                 val expirationTime = tokenTime + tokenExpiration
@@ -112,19 +107,18 @@ object JwtPayWall {
 
         val encryptedToken = encodeOpenSsl(payloadString)
         logd("New tracking token generated and saved", TokenPayWall)
-        Hawk.put(AUTHEN_TRACKING, encryptedToken)
+        authenTracking = encryptedToken
     }
     
 
     fun isTrackingTokenExpired(): Boolean {
         return try {
-            val trackingToken = Hawk.get<String>(AUTHEN_TRACKING, null)
-            if (trackingToken.isNullOrEmpty()) {
+            if (authenTracking.isEmpty()) {
                 logd("No tracking token found", TokenPayWall)
                 return true
             }
             
-            val decryptedPayload = decodeOpenSsl(trackingToken)
+            val decryptedPayload = decodeOpenSsl(authenTracking)
             val jsonObject = JsonParser.parseString(decryptedPayload).asJsonObject
             val tokenTime = jsonObject.get("time")?.asLong ?: 0L
             val currentTime = System.currentTimeMillis() / 1000
