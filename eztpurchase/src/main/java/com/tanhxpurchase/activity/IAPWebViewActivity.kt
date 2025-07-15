@@ -155,6 +155,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             infoScreen.paywallConfigId = it.paywallConfigId
             infoScreen.storeId = it.storeId
         }
+        logD("TANHXXXX =>>>>> infoScreen:${infoScreen}")
     }
 
     override fun onResume() {

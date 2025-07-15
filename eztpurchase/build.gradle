@@ -87,7 +87,7 @@ afterEvaluate {
             release(MavenPublication) {
                 groupId = 'TanhB02'
                 artifactId = 'eztpaywall'
-                version = '1.0.0-beta6'
+                version = '1.0.0-beta7'
 
                 afterEvaluate {
                     from components.release
