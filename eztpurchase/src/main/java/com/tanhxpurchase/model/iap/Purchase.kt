@@ -13,3 +13,9 @@ data class Purchase(
     val autoRenewing: Boolean = false,
     val acknowledged: Boolean = false
 )
+
+data class InfoScreen(
+    var paywallConfigId : Int = 0,
+    var storeId : Int = 0,
+    var templateId : Int = 0
+)

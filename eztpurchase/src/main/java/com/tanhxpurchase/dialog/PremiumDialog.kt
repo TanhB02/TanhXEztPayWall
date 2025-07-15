@@ -25,8 +25,11 @@ import com.tanhxpurchase.base.BaseDialog
 import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
 import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
+import com.tanhxpurchase.model.iap.InfoScreen
+import com.tanhxpurchase.util.TemplateDataManager.createTrackingEventFromValue
 import com.tanhxpurchase.util.configureWebViewSettings
 import com.tanhxpurchase.util.logd
+import com.tanhxpurchase.util.loge
 import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.toGone
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +53,7 @@ class PremiumDialog(
     private lateinit var url : String
     private var jobTimeOut: Job? = null
     private var injectionScript: String? = null
+    private var infoScreen : InfoScreen = InfoScreen()
     private val viewModel: IAPWebViewViewModel =
         ViewModelProvider(context as ViewModelStoreOwner)[IAPWebViewViewModel::class.java]
     private var currentWebView: WebView? = null
@@ -76,10 +80,14 @@ class PremiumDialog(
         }
         trackingShowScreen(context,screenName,isFromTo)
         TimeOutWithNoPrice()
+        createTrackingEventFromValue(screenName, isFromTo, 0)?.let {
+            infoScreen.templateId = it.templateId
+            infoScreen.paywallConfigId = it.paywallConfigId
+            infoScreen.storeId = it.storeId
+        }
     }
 
     private fun dissMiss(){
-
         lifecycles.launch {
             delay(100)
             dismiss()
@@ -115,7 +123,7 @@ class PremiumDialog(
                             evaluateJavascript(injectionScript!!, null)
                         }
                     } catch (e: Exception) {
-                        logd("TANHXXXX => Error evaluating JavaScript in DialogPremium: ${e.message}")
+                        loge("TANHXXXX => Error evaluating JavaScript in DialogPremium: ${e.message}")
                     }
                 }, onReceivedError = {
                     if (isShowing) {
@@ -136,7 +144,7 @@ class PremiumDialog(
                 addJavascriptInterface(IAPWebInterface(this@PremiumDialog), Android)
             }
         } catch (e: Exception) {
-            logd("TANHXXXX => Error creating WebView in DialogPremium: ${e.message}")
+            loge("TANHXXXX => Error creating WebView in DialogPremium: ${e.message}")
             if (isShowing) {
                 onFailureCallback.invoke()
                 jobTimeOut?.cancel()
@@ -185,6 +193,7 @@ class PremiumDialog(
         PurchaseUtils.buy(
             context,
             producID,
+            infoScreen,
             onPurchaseSuccess = { purchase ->
                 dismiss()
             },

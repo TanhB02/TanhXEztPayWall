@@ -9,7 +9,13 @@ data class IAPPurchase(
     @SerializedName("payload")
     var payload: IAPPayload? = IAPPayload(),
     @SerializedName("step")
-    var step: Int = 1
+    var step: Int = 1,
+    @SerializedName("paywall_config_id")
+    var paywallConfigId: Int = 0,
+    @SerializedName("store_id")
+    var storeId: Int = 0,
+    @SerializedName("template_id")
+    var templateId: Int = 0,
 ) {
     companion object {
         fun from(purchase: CustomPurchase): IAPPurchase {

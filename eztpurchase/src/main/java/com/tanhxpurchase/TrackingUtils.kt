@@ -7,6 +7,7 @@ import com.tanhxpurchase.ConstantsPurchase.SHOW_PAYWALL
 import com.tanhxpurchase.ConstantsPurchase.UPGRADE_PAYWALL
 import com.tanhxpurchase.ConstantsPurchase.WATCHADS_PAYWALL
 import com.tanhxpurchase.util.TemplateDataManager.createTrackingEventFromValue
+import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.worker.WokerMananer.enqueueTrackingEvent
 
 object TrackingUtils {
@@ -25,6 +26,7 @@ object TrackingUtils {
 
     fun trackingBuy(context: Context, value: String, productId: String, isFromTo: String) {
         createTrackingEventFromValue(value, isFromTo, BUY_PAYWALL, productId)?.let {
+            logD("TANHXXXX =>>>>> it:${it}")
             enqueueTrackingEvent(context, it)
         }
     }

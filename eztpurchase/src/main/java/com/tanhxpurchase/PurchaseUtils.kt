@@ -15,10 +15,13 @@ import com.tanhxpurchase.model.iap.Purchase
 import com.tanhxpurchase.hawk.EzTechHawk.countryCode
 import com.tanhxpurchase.hawk.EzTechHawk.isDarkMode
 import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.privacyPolicy
 import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
+import com.tanhxpurchase.hawk.EzTechHawk.termsOfService
+import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
+import com.tanhxpurchase.model.iap.InfoScreen
 import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
-import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.WokerMananer.enqueueIAPLogging
 import kotlinx.coroutines.CoroutineScope
@@ -132,7 +135,7 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
     fun buy(
-        activity: Activity, id: String,
+        activity: Activity, id: String,infoScreen: InfoScreen,
         onPurchaseFailure: (code: Int, errorMsg: String?) -> Unit = { _, _ -> },
         onOwnedProduct: (productId: String) -> Unit = {},
         onUserCancelBilling: () -> Unit = {},
@@ -142,7 +145,8 @@ object PurchaseUtils : PurchaseUpdateListener {
             override fun onPurchaseSuccess(purchases: Purchase) {
                 onPurchaseSuccess(purchases)
                 logD("TANHXXXX =>>>>> purchases:${purchases}")
-                enqueueIAPLogging(activity.applicationContext, purchases)
+                logD("TANHXXXX =>>>>> infoScreen: ${infoScreen}")
+                enqueueIAPLogging(activity.applicationContext, purchases,infoScreen)
             }
 
             override fun onPurchaseFailure(code: Int, errorMsg: String?) {
@@ -179,10 +183,6 @@ object PurchaseUtils : PurchaseUpdateListener {
             },
             onCloseClicked = onCloseClicked,
         )
-    }
-
-    fun setCountryCode(countryCodeX: String) {
-        countryCode = countryCodeX
     }
 
     fun getPrice(id: String): String = billingService.getPrice(id)
@@ -237,13 +237,28 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
+    fun setCountryCode(countryCodeX: String) {
+        countryCode = countryCodeX
+    }
+
     fun setDarkMode(isDarkModeX: Boolean) {
         isDarkMode = isDarkModeX
     }
 
+    fun setLinkPolicy(url : String){
+        privacyPolicy = url
+    }
+
+    fun setLinkTerms(url: String){
+        termsOfService = url
+    }
+
+    fun setTimeOutPayWall(timeOut : Long){
+        timeOutPayWall = timeOut
+    }
+
     override fun onPurchaseSuccess(purchases: Purchase) {
         super.onPurchaseSuccess(purchases)
-        logFirebaseEvent("${purchases.productId}_sub_ok")
         mPurchaseUpdateListener?.onPurchaseSuccess(purchases)
         _isRemoveAds.value = isRemoveAds()
     }
@@ -251,10 +266,9 @@ object PurchaseUtils : PurchaseUpdateListener {
     override fun onPurchaseFailure(code: Int, errorMsg: String?) {
         super.onPurchaseFailure(code, errorMsg)
         try {
-            logFirebaseEvent("sub_failed")
             mPurchaseUpdateListener?.onPurchaseFailure(code, errorMsg)
         } catch (ex: Exception) {
-            logFirebaseEvent("sub_failed_trycatch")
+            logD("TANHXXXX =>>>>> error: ${ex}")
         }
     }
 
@@ -270,73 +284,4 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
 
-    class Builder() {
-        private val mSubscriptions: MutableList<String> = mutableListOf()
-        private val mOneTimeProducts: MutableList<String> = mutableListOf()
-        private val mConsumableProducts: MutableList<String> = mutableListOf()
-        private val mRemoveAds: MutableList<String> = mutableListOf()
-
-        /**
-         * product ID của gói subscription
-         */
-        fun subscriptions(subscriptions: List<String>) = apply {
-            mSubscriptions.clear()
-            mSubscriptions.addAll(subscriptions)
-        }
-
-        fun subscriptions(vararg subscriptions: String) = apply {
-            mSubscriptions.clear()
-            mSubscriptions.addAll(subscriptions)
-        }
-
-        /**
-         * sản phẩm chỉ mua một lần, không lặp lại.
-         */
-        fun oneTimeProducts(oneTimeProducts: List<String>) = apply {
-            mOneTimeProducts.clear()
-            mOneTimeProducts.addAll(oneTimeProducts)
-        }
-
-        fun oneTimeProducts(vararg oneTimeProducts: String) = apply {
-            mOneTimeProducts.clear()
-            mOneTimeProducts.addAll(oneTimeProducts)
-        }
-
-        /**
-         * người dùng mua rồi dùng hết và có thể mua lại
-         */
-        fun consumableProducts(consumableProducts: List<String>) = apply {
-            mConsumableProducts.clear()
-            mConsumableProducts.addAll(consumableProducts)
-        }
-
-        fun consumableProducts(vararg consumableProducts: String) = apply {
-            mConsumableProducts.clear()
-            mConsumableProducts.addAll(consumableProducts)
-        }
-
-        /**
-         * Các gói xóa ads
-         */
-
-        fun removeAds(removeAds: List<String>) = apply {
-            mRemoveAds.clear()
-            mRemoveAds.addAll(removeAds)
-        }
-
-        fun removeAds(vararg removeAds: String) = apply {
-            mRemoveAds.clear()
-            mRemoveAds.addAll(removeAds)
-        }
-
-
-        fun build() {
-            addSubscriptionAndProduct(
-                mSubscriptions,
-                mOneTimeProducts,
-                mConsumableProducts
-            )
-            setListRemoveAdsId(mRemoveAds)
-        }
-    }
 }

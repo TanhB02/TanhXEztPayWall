@@ -22,6 +22,7 @@ import com.tanhxpurchase.network.TemplateApiService
 import com.tanhxpurchase.util.ApiResult
 import com.tanhxpurchase.util.JwtPayWall
 import com.tanhxpurchase.util.JwtPayWall.generateTrackingToken
+import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.logd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -91,10 +92,12 @@ class TemplateRepository(
             if (response.isSuccessful) {
                 response.body()?.let { body ->
                     logd("Device registration successful: ${body.data.device.id}", API)
-
+                    val bundle = android.os.Bundle().apply {
+                        putString("device_id", body.data.device.id)
+                    }
+                    logFirebaseEvent("id_server", bundle)
                     accessToken = body.data.accessToken
                     logd("Access token saved to storage", API)
-                    
                     emit(ApiResult.Success(body))
                 } ?: run {
                     logd("Device registration response body is null", API)

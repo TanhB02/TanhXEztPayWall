@@ -13,6 +13,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
+import com.tanhxpurchase.util.logD
 
 
 abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
@@ -31,6 +32,7 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         hideSystemUI()
         super.onCreate(savedInstanceState)
+        logD("TANHXXXX =>>>>> onCreate:${savedInstanceState}")
 
         binding = getDataBinding()
         setContentView(binding.root)

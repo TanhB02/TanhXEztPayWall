@@ -79,6 +79,7 @@ com.tanhxpurchase.util.JwtPayWall:
     private static final java.lang.String DEVICE_SECRET_KEY
 com.tanhxpurchase.util.ProductDetailsExtKt:
     public static final void logFirebaseEvent(java.lang.String)
+    public static synthetic void logFirebaseEvent$default(java.lang.String,android.os.Bundle,int,java.lang.Object)
 com.tanhxpurchase.util.TemplateDataManager:
     public final com.tanhxpurchase.model.template.TrackingEventRequest createTrackingEventFromUrl(java.lang.String,int,java.lang.String)
     public static synthetic com.tanhxpurchase.model.template.TrackingEventRequest createTrackingEventFromUrl$default(com.tanhxpurchase.util.TemplateDataManager,java.lang.String,int,java.lang.String,int,java.lang.Object)

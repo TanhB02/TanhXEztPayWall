@@ -14,6 +14,7 @@ import com.tanhxpurchase.model.iap.RemoteProductConfig
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
 import com.tanhxpurchase.util.ApiResult
+import com.tanhxpurchase.util.Builder
 import com.tanhxpurchase.util.JwtPayWall.jwtToken
 import com.tanhxpurchase.util.TemplateDataManager
 import com.tanhxpurchase.util.logD
@@ -104,7 +105,7 @@ abstract class EztApplication : Application() {
         infoProductID = remoteConfig
         producFreetrial = remoteConfig.freeTrial
 
-        PurchaseUtils.Builder()
+        Builder()
             .fromRemoteConfig(remoteConfig)
             .build()
     }
@@ -150,7 +151,7 @@ abstract class EztApplication : Application() {
     abstract fun getDefaultProductConfig(): RemoteProductConfig
 }
 
-fun PurchaseUtils.Builder.fromRemoteConfig(config: RemoteProductConfig): PurchaseUtils.Builder {
+fun Builder.fromRemoteConfig(config: RemoteProductConfig): Builder {
     subscriptions(config.subscriptions)
     oneTimeProducts(config.oneTimeProducts)
     consumableProducts(config.consumableProducts)

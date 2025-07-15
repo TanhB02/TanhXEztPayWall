@@ -16,25 +16,29 @@ import com.tanhxpurchase.ConstantsPurchase.Base_Plan_Id_Yearly_Trial
 import com.tanhxpurchase.ConstantsPurchase.CLOSE
 import com.tanhxpurchase.ConstantsPurchase.PAYLOAD_RECEIVED
 import com.tanhxpurchase.ConstantsPurchase.POLICY
-import com.tanhxpurchase.PurchaseUtils
-import com.tanhxpurchase.PurchaseUtils.getPayWall
 import com.tanhxpurchase.ConstantsPurchase.RESTORE
 import com.tanhxpurchase.ConstantsPurchase.Restore
 import com.tanhxpurchase.ConstantsPurchase.TERMS
+import com.tanhxpurchase.PurchaseUtils
+import com.tanhxpurchase.PurchaseUtils.getPayWall
 import com.tanhxpurchase.TrackingUtils.trackingBuy
 import com.tanhxpurchase.TrackingUtils.trackingCloseScreen
 import com.tanhxpurchase.TrackingUtils.trackingShowScreen
 import com.tanhxpurchase.base.BaseActivity
 import com.tanhxpurchase.customview.ItemIAPView
-import com.tanhxpurchase.listeners.IAPWebInterface
-import com.tanhxpurchase.listeners.IAPWebViewCallback
 import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
 import com.tanhxpurchase.hawk.EzTechHawk.privacyPolicy
 import com.tanhxpurchase.hawk.EzTechHawk.termsOfService
 import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
+import com.tanhxpurchase.listeners.IAPWebInterface
+import com.tanhxpurchase.listeners.IAPWebViewCallback
+import com.tanhxpurchase.model.iap.InfoScreen
+import com.tanhxpurchase.util.TemplateDataManager.createTrackingEventFromValue
 import com.tanhxpurchase.util.clickeffect.setOnClickShrinkEffectListener
 import com.tanhxpurchase.util.configureWebViewSettings
+import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
+import com.tanhxpurchase.util.loge
 import com.tanhxpurchase.util.openLink
 import com.tanhxpurchase.util.setTextHtml
 import com.tanhxpurchase.util.setTextRes
@@ -56,6 +60,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
     private lateinit var screenName: String
     private lateinit var isFromTo: String
     private var jobTimeOut: Job? = null
+    private var infoScreen : InfoScreen = InfoScreen()
 
     interface IAPCallback {
         fun onPurchaseSuccess()
@@ -121,7 +126,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
         shineAnimation(binding.shine)
         screenName = intent.getStringExtra(SCREEN_NAME).toString()
         isFromTo = intent.getStringExtra(IS_FROM_TO).toString()
-        urlWeb = getPayWall(packageName,screenName)
+        urlWeb = getPayWall(packageName, screenName)
         if (urlWeb.isBlank() || urlWeb == "null") {
             onFailureCallbackWithError()
             return
@@ -144,7 +149,12 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
             )
         }
         TimeOutWithNoPrice()
-        trackingShowScreen(this@IAPWebViewActivity, screenName,isFromTo)
+        trackingShowScreen(this@IAPWebViewActivity, screenName, isFromTo)
+        createTrackingEventFromValue(screenName, isFromTo, 0)?.let {
+            infoScreen.templateId = it.templateId
+            infoScreen.paywallConfigId = it.paywallConfigId
+            infoScreen.storeId = it.storeId
+        }
     }
 
     override fun onResume() {
@@ -161,7 +171,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
                                 evaluateJavascript(injectionScript!!, null)
                             }
                         } catch (e: Exception) {
-                            logd("TANHXXXX => Error evaluating JavaScript: ${e.message}")
+                            loge("TANHXXXX => Error evaluating JavaScript: ${e.message}")
                         }
                     }, onReceivedError = {
                         onFailureCallbackWithError()
@@ -250,6 +260,7 @@ class IAPWebViewActivity : BaseActivity<ActivityIapWebViewBinding>(), IAPWebView
         PurchaseUtils.buy(
             this,
             producID,
+            infoScreen,
             onPurchaseSuccess = { purchase ->
                 if (!isDestroyed && !isFinishing) {
                     iapCallback?.onPurchaseSuccess()
