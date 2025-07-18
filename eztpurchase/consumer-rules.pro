@@ -20,6 +20,7 @@
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
 
+-keep class * implements com.android.billingclient.api.PurchasesUpdatedListener { *; }
 -keep class com.android.billingclient.api.** { *; }
 -keep interface com.android.billingclient.api.** { *; }
 

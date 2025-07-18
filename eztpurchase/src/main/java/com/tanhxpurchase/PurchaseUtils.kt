@@ -3,6 +3,7 @@ package com.tanhxpurchase
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import androidx.annotation.Keep
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
@@ -15,10 +16,13 @@ import com.tanhxpurchase.model.iap.Purchase
 import com.tanhxpurchase.hawk.EzTechHawk.countryCode
 import com.tanhxpurchase.hawk.EzTechHawk.isDarkMode
 import com.tanhxpurchase.hawk.EzTechHawk.isFreeTrial
+import com.tanhxpurchase.hawk.EzTechHawk.privacyPolicy
 import com.tanhxpurchase.hawk.EzTechHawk.producFreetrial
+import com.tanhxpurchase.hawk.EzTechHawk.termsOfService
+import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
+import com.tanhxpurchase.model.iap.InfoScreen
 import com.tanhxpurchase.util.TemplateDataManager.getTemplateUrlByName
 import com.tanhxpurchase.util.logD
-import com.tanhxpurchase.util.logFirebaseEvent
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.WokerMananer.enqueueIAPLogging
 import kotlinx.coroutines.CoroutineScope
@@ -28,11 +32,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
+@Keep
 object PurchaseUtils : PurchaseUpdateListener {
 
     private val _isRemoveAds = MutableStateFlow(false)
     val isRemoveAds: Flow<Boolean> get() = _isRemoveAds
 
+    @Keep
     fun getInstance() = this
 
     private val billingService by lazy {
@@ -65,7 +71,7 @@ object PurchaseUtils : PurchaseUpdateListener {
             }
         }
     }
-
+    @Keep
     fun showDialogPayWall(
         context: Activity,
         screenName : String,
@@ -94,6 +100,7 @@ object PurchaseUtils : PurchaseUpdateListener {
         dialog.show()
     }
 
+    @Keep
     fun showBottomSheetPayWall(
         activity: FragmentActivity,
         screenName: String,
@@ -119,20 +126,22 @@ object PurchaseUtils : PurchaseUpdateListener {
         bottomSheet.show(activity.supportFragmentManager, "PremiumBottomSheet")
     }
 
+    @Keep
     fun getPayWall(packageName: String, keyConfig: String): String {
         val url = getTemplateUrlByName(packageName, keyConfig)
         logD("TANHXXXX =>>>>> url:${url}")
         return url
     }
 
-
+    @Keep
     fun addInitBillingFinishListener(listener: () -> Unit) {
         initFinishListener.add(listener)
         if (isAvailable) listener()
     }
 
+    @Keep
     fun buy(
-        activity: Activity, id: String,
+        activity: Activity, id: String,infoScreen: InfoScreen,
         onPurchaseFailure: (code: Int, errorMsg: String?) -> Unit = { _, _ -> },
         onOwnedProduct: (productId: String) -> Unit = {},
         onUserCancelBilling: () -> Unit = {},
@@ -142,7 +151,8 @@ object PurchaseUtils : PurchaseUpdateListener {
             override fun onPurchaseSuccess(purchases: Purchase) {
                 onPurchaseSuccess(purchases)
                 logD("TANHXXXX =>>>>> purchases:${purchases}")
-                enqueueIAPLogging(activity.applicationContext, purchases)
+                logD("TANHXXXX =>>>>> infoScreen: ${infoScreen}")
+                enqueueIAPLogging(activity.applicationContext, purchases,infoScreen)
             }
 
             override fun onPurchaseFailure(code: Int, errorMsg: String?) {
@@ -160,6 +170,7 @@ object PurchaseUtils : PurchaseUpdateListener {
         billingService.buy(activity, id)
     }
 
+    @Keep
     fun startActivityIAP(
         context: Activity,
         screenName: String,
@@ -181,18 +192,19 @@ object PurchaseUtils : PurchaseUpdateListener {
         )
     }
 
-    fun setCountryCode(countryCodeX: String) {
-        countryCode = countryCodeX
-    }
-
+    @Keep
     fun getPrice(id: String): String = billingService.getPrice(id)
 
+    @Keep
     fun getPriceWithoutCurrency(id: String): Float = billingService.getPriceWithoutCurrency(id)
 
+    @Keep
     fun getCurrency(id: String): String = billingService.getCurrency(id)
 
+    @Keep
     fun getDiscountPrice(id: String): String = billingService.getDiscountPrice(id)
 
+    @Keep
     fun setActionPurchase(actionSuccess: () -> Unit, actionFailed: () -> Unit) {
         if (isRemoveAds()) {
             actionSuccess()
@@ -201,10 +213,13 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
+    @Keep
     fun isRemoveAds() = billingService.isRemoveAds()
 
+    @Keep
     fun checkPurchased() = billingService.checkPurchased()
 
+    @Keep
     fun addSubscriptionAndProduct(
         listSubscriptionId: List<String> = listOf(),
         listOnetimeProductId: List<String> = listOf(),
@@ -217,11 +232,12 @@ object PurchaseUtils : PurchaseUpdateListener {
         )
     }
 
+    @Keep
     fun setListRemoveAdsId(list: List<String>) {
         billingService.setListRemoveAdsId(list)
     }
 
-
+    @Keep
     fun getPayload(): String {
         Log.d(EZT_Purchase, "getPayload: ${billingService.getStandardJsonPayload()}")
         return billingService.getStandardJsonPayload()
@@ -237,13 +253,31 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
+    @Keep
+    fun setCountryCode(countryCodeX: String) {
+        countryCode = countryCodeX
+    }
+    @Keep
     fun setDarkMode(isDarkModeX: Boolean) {
         isDarkMode = isDarkModeX
+    }
+    @Keep
+    fun setLinkPolicy(url : String){
+        privacyPolicy = url
+    }
+
+    @Keep
+    fun setLinkTerms(url: String){
+        termsOfService = url
+    }
+
+    @Keep
+    fun setTimeOutPayWall(timeOut : Long){
+        timeOutPayWall = timeOut
     }
 
     override fun onPurchaseSuccess(purchases: Purchase) {
         super.onPurchaseSuccess(purchases)
-        logFirebaseEvent("${purchases.productId}_sub_ok")
         mPurchaseUpdateListener?.onPurchaseSuccess(purchases)
         _isRemoveAds.value = isRemoveAds()
     }
@@ -251,10 +285,9 @@ object PurchaseUtils : PurchaseUpdateListener {
     override fun onPurchaseFailure(code: Int, errorMsg: String?) {
         super.onPurchaseFailure(code, errorMsg)
         try {
-            logFirebaseEvent("sub_failed")
             mPurchaseUpdateListener?.onPurchaseFailure(code, errorMsg)
         } catch (ex: Exception) {
-            logFirebaseEvent("sub_failed_trycatch")
+            logD("TANHXXXX =>>>>> error: ${ex}")
         }
     }
 
@@ -270,73 +303,4 @@ object PurchaseUtils : PurchaseUpdateListener {
     }
 
 
-    class Builder() {
-        private val mSubscriptions: MutableList<String> = mutableListOf()
-        private val mOneTimeProducts: MutableList<String> = mutableListOf()
-        private val mConsumableProducts: MutableList<String> = mutableListOf()
-        private val mRemoveAds: MutableList<String> = mutableListOf()
-
-        /**
-         * product ID của gói subscription
-         */
-        fun subscriptions(subscriptions: List<String>) = apply {
-            mSubscriptions.clear()
-            mSubscriptions.addAll(subscriptions)
-        }
-
-        fun subscriptions(vararg subscriptions: String) = apply {
-            mSubscriptions.clear()
-            mSubscriptions.addAll(subscriptions)
-        }
-
-        /**
-         * sản phẩm chỉ mua một lần, không lặp lại.
-         */
-        fun oneTimeProducts(oneTimeProducts: List<String>) = apply {
-            mOneTimeProducts.clear()
-            mOneTimeProducts.addAll(oneTimeProducts)
-        }
-
-        fun oneTimeProducts(vararg oneTimeProducts: String) = apply {
-            mOneTimeProducts.clear()
-            mOneTimeProducts.addAll(oneTimeProducts)
-        }
-
-        /**
-         * người dùng mua rồi dùng hết và có thể mua lại
-         */
-        fun consumableProducts(consumableProducts: List<String>) = apply {
-            mConsumableProducts.clear()
-            mConsumableProducts.addAll(consumableProducts)
-        }
-
-        fun consumableProducts(vararg consumableProducts: String) = apply {
-            mConsumableProducts.clear()
-            mConsumableProducts.addAll(consumableProducts)
-        }
-
-        /**
-         * Các gói xóa ads
-         */
-
-        fun removeAds(removeAds: List<String>) = apply {
-            mRemoveAds.clear()
-            mRemoveAds.addAll(removeAds)
-        }
-
-        fun removeAds(vararg removeAds: String) = apply {
-            mRemoveAds.clear()
-            mRemoveAds.addAll(removeAds)
-        }
-
-
-        fun build() {
-            addSubscriptionAndProduct(
-                mSubscriptions,
-                mOneTimeProducts,
-                mConsumableProducts
-            )
-            setListRemoveAdsId(mRemoveAds)
-        }
-    }
 }

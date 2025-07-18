@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.tanhxpurchase.hawk.EzTechHawk
+import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 import java.util.Locale
 

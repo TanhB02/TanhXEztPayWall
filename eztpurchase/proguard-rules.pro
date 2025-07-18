@@ -1,6 +1,3 @@
--optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
--optimizationpasses 5
--allowaccessmodification
 -repackageclasses 'com.lib.tanhx_purchase.obf'
 -printmapping out/mapping.txt
 #-assumenosideeffects class android.util.Log {
@@ -55,6 +52,7 @@
 -keep class com.google.firebase.analytics.** { *; }
 -keep class com.android.billingclient.api.** { *; }
 -keep interface com.android.billingclient.api.** { *; }
+-keep public interface com.android.billingclient.api.PurchasesUpdatedListener
 -keep public class com.airbnb.lottie.** { *; }
 -dontwarn com.airbnb.lottie.**
 -keep class com.auth0.jwt.** { *; }
@@ -74,6 +72,11 @@
 -keep class androidx.databinding.** { *; }
 -keep public class com.tanhxpurchase.PurchaseUtils { *; }
 -keep public class com.tanhxpurchase.EztApplication { *; }
+-keep public class com.tanhxpurchase.TrackingUtils { *; }
+-keep public class com.tanhxpurchase.worker.WokerMananer { *; }
+-keep public class com.tanhxpurchase.worker.trackingevent.TrackingEventWorker { *; }
+-keep public class com.tanhxpurchase.worker.registerdevice.DeviceRegistrationWorker { *; }
+-keep public class com.tanhxpurchase.worker.paydone.IAPLoggingWorker { *; }
 -keep public class com.tanhxpurchase.base.** { *; }
 -keep public class com.tanhxpurchase.dialog.** { *; }
 -keep public class com.tanhxpurchase.customview.** { *; }
@@ -129,8 +132,6 @@
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
 
--mergeinterfacesaggressively
--overloadaggressively
 
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkParameterIsNotNull(...);

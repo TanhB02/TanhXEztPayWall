@@ -1,6 +1,7 @@
 package com.tanhxpurchase.worker.paydone
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
@@ -11,9 +12,11 @@ import com.tanhxpurchase.model.iap.Purchase
 import com.tanhxpurchase.model.template.IAPPurchase
 import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
+import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 
+@Keep
 class IAPLoggingWorker(
     context: Context,
     params: WorkerParameters
@@ -27,12 +30,16 @@ class IAPLoggingWorker(
             val purchaseJson = inputData.getString(KEY_PURCHASE_DATA)
 
             if (purchaseJson.isNullOrEmpty()) return Result.failure()
-
             val iapPurchase = IAPPurchase.from(Gson().fromJson(purchaseJson, Purchase::class.java))
-
+            val infoScreen = inputData.getString(INFO_SCREEN)?.let {
+                Gson().fromJson(it, com.tanhxpurchase.model.iap.InfoScreen::class.java)
+            }
             if (configIAP == null) return Result.failure()
 
             if (iapPurchase.payload?.productId in configIAP!!.oneTimeProducts) iapPurchase.type = 2
+            iapPurchase.templateId = infoScreen?.templateId ?: 0
+            iapPurchase.paywallConfigId = infoScreen?.paywallConfigId ?: 0
+            iapPurchase.storeId = infoScreen?.storeId ?: 0
 
             var finalResult: Result = Result.failure()
             if (accessToken.isEmpty()) {
@@ -69,5 +76,6 @@ class IAPLoggingWorker(
 
     companion object {
         const val KEY_PURCHASE_DATA = "purchase_data"
+        const val INFO_SCREEN = "info_screen"
     }
 }

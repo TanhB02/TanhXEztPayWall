@@ -1,5 +1,8 @@
 package com.tanhxpurchase
 
+import androidx.annotation.Keep
+
+@Keep
 object ConstantsPurchase {
     const val BASE_URL = "https://paywall.eztechglobal.com"
 

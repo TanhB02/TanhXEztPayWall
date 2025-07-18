@@ -1,6 +1,7 @@
 package com.tanhxpurchase.worker
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.Data
@@ -10,6 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.tanhxpurchase.ConstantsPurchase.API
+import com.tanhxpurchase.model.iap.InfoScreen
 import com.tanhxpurchase.model.iap.Purchase
 import com.tanhxpurchase.model.template.TrackingEventRequest
 import com.tanhxpurchase.util.logd
@@ -18,6 +20,7 @@ import com.tanhxpurchase.worker.registerdevice.DeviceRegistrationWorker
 import com.tanhxpurchase.worker.trackingevent.TrackingEventWorker
 import java.util.concurrent.TimeUnit
 
+@Keep
 object WokerMananer {
     private const val DEVICE_REGISTRATION_WORK_NAME = "device_registration_work"
     private const val IAP_LOGGING_WORK_NAME = "iap_logging_work"
@@ -42,16 +45,14 @@ object WokerMananer {
         }
     }
 
-
-    fun enqueueIAPLogging(context: Context, purchase: Purchase) {
+    fun enqueueIAPLogging(context: Context, purchase: Purchase, infoScreen: InfoScreen) {
         try {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
-
-            val purchaseJson = Gson().toJson(purchase)
             val inputData = Data.Builder()
-                .putString(IAPLoggingWorker.KEY_PURCHASE_DATA, purchaseJson)
+                .putString(IAPLoggingWorker.KEY_PURCHASE_DATA, Gson().toJson(purchase))
+                .putString(IAPLoggingWorker.INFO_SCREEN,Gson().toJson(infoScreen))
                 .build()
 
             val workRequest = OneTimeWorkRequestBuilder<IAPLoggingWorker>()
@@ -60,7 +61,7 @@ object WokerMananer {
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(
-                "${IAP_LOGGING_WORK_NAME}_${System.currentTimeMillis()}", // Unique name với timestamp
+                "${IAP_LOGGING_WORK_NAME}_${System.currentTimeMillis()}",
                 ExistingWorkPolicy.REPLACE,
                 workRequest
             )
@@ -94,7 +95,10 @@ object WokerMananer {
 
             WorkManager.getInstance(context).enqueue(workRequest)
         } catch (e: Exception) {
-            logd("TrackingEventManager: Failed to enqueue custom tracking event work: ${e.message}", API)
+            logd(
+                "TrackingEventManager: Failed to enqueue custom tracking event work: ${e.message}",
+                API
+            )
         }
     }
 }

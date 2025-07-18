@@ -24,9 +24,12 @@ import com.tanhxpurchase.base.BaseBottomSheetDialogFragment
 import com.tanhxpurchase.hawk.EzTechHawk.timeOutPayWall
 import com.tanhxpurchase.listeners.IAPWebInterface
 import com.tanhxpurchase.listeners.IAPWebViewCallback
+import com.tanhxpurchase.model.iap.InfoScreen
+import com.tanhxpurchase.util.TemplateDataManager.createTrackingEventFromValue
 import com.tanhxpurchase.util.configureWebViewSettings
 import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
+import com.tanhxpurchase.util.loge
 import com.tanhxpurchase.util.setupWebViewClientWithTimeout
 import com.tanhxpurchase.util.toGone
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +51,7 @@ class PremiumBottomSheet :
     private var watchAdsCallBack: (() -> Unit)? = null
     private var onFailureCallback: (() -> Unit)? = null
     private var jobTimeOut: Job? = null
+    private var infoScreen : InfoScreen = InfoScreen()
 
     companion object {
         private const val SCREEEN_NAME = "screen_name"
@@ -82,6 +86,11 @@ class PremiumBottomSheet :
     override fun initViewModel() {
         binding.viewModel = viewModel
         injectionScript = viewModel.createInjectionScript(requireContext())
+        createTrackingEventFromValue(screenName, isFromTo, 0)?.let {
+            infoScreen.templateId = it.templateId
+            infoScreen.paywallConfigId = it.paywallConfigId
+            infoScreen.storeId = it.storeId
+        }
     }
 
     private fun TimeOutWithNoPrice() {
@@ -107,7 +116,7 @@ class PremiumBottomSheet :
             return
         }
         setupWebView()
-        logD("TANHXXXX =>>>>> url:${url}")
+        loge("TANHXXXX =>>>>> url:${url}")
         try {
             currentWebView?.loadUrl(url)
         } catch (e: Exception) {
@@ -134,7 +143,7 @@ class PremiumBottomSheet :
                             evaluateJavascript(injectionScript!!, null)
                         }
                     } catch (e: Exception) {
-                        logd("TANHXXXX => Error evaluating JavaScript in PremiumBottomSheet: ${e.message}")
+                        loge("TANHXXXX => Error evaluating JavaScript in PremiumBottomSheet: ${e.message}")
                     }
                 }, onReceivedError = {
                     if (isVisible && !isDetached) {
@@ -155,7 +164,7 @@ class PremiumBottomSheet :
                 addJavascriptInterface(IAPWebInterface(this@PremiumBottomSheet), Android)
             }
         } catch (e: Exception) {
-            logd("TANHXXXX => Error creating WebView in PremiumBottomSheet: ${e.message}")
+            loge("TANHXXXX => Error creating WebView in PremiumBottomSheet: ${e.message}")
             if (isVisible && !isDetached) {
                 onFailureCallback?.invoke()
                 jobTimeOut?.cancel()
@@ -169,6 +178,7 @@ class PremiumBottomSheet :
         PurchaseUtils.buy(
             requireActivity(),
             producID,
+            infoScreen,
             onPurchaseSuccess = { purchase ->
                 dismiss()
             },

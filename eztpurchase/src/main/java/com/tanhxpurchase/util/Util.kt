@@ -93,6 +93,12 @@ fun logd(message: String? = null, tag: String = EZT_Purchase) {
     }
 }
 
+fun loge(message: String? = null, tag: String = EZT_Purchase) {
+    if (enableLog) {
+        Log.d(tag, message ?: "null")
+    }
+}
+
 fun Context.dpToPx(dp: Int): Int {
     val density = resources.displayMetrics.density
     return (dp * density).toInt()
@@ -334,7 +340,7 @@ fun createStandardJsonPayload(productDetailsList: List<ProductDetails>?): String
 
         Gson().toJson(finalResult)
     } catch (e: Exception) {
-        logd("TANHXXXX =>>>>>❌ Error creating standard JSON payload: ${e.message}")
+        loge("TANHXXXX =>>>>>❌ Error creating standard JSON payload: ${e.message}")
         "{\"data\":{\"infoPurchase\":[],\"countryCode\":\"${countryCode}\",\"isFreeTrial\":${isFreeTrial},\"darkMode\":${isDarkMode}}}"
     }
 }

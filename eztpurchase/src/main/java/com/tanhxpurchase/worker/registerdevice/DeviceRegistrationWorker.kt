@@ -1,6 +1,7 @@
 package com.tanhxpurchase.worker.registerdevice
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.tanhxpurchase.ConstantsPurchase.API
@@ -8,6 +9,7 @@ import com.tanhxpurchase.repository.TemplateRepository
 import com.tanhxpurchase.util.ApiResult
 import com.tanhxpurchase.util.logd
 
+@Keep
 class DeviceRegistrationWorker(
     context: Context,
     params: WorkerParameters

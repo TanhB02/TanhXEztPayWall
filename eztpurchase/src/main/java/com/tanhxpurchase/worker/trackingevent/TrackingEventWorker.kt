@@ -1,6 +1,7 @@
 package com.tanhxpurchase.worker.trackingevent
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
@@ -12,6 +13,7 @@ import com.tanhxpurchase.util.ApiResult
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 
+@Keep
 class TrackingEventWorker(
     context: Context,
     params: WorkerParameters
