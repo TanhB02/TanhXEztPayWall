@@ -1,6 +1,7 @@
 package com.tanhxpurchase
 
 import android.app.Application
+import androidx.annotation.Keep
 import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+@Keep
 abstract class EztApplication : Application() {
 
     companion object {

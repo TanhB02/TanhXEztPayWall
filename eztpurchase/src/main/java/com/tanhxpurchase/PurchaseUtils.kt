@@ -3,6 +3,7 @@ package com.tanhxpurchase
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import androidx.annotation.Keep
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.tanhxpurchase.ConstantsPurchase.EZT_Purchase
@@ -31,11 +32,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
+@Keep
 object PurchaseUtils : PurchaseUpdateListener {
 
     private val _isRemoveAds = MutableStateFlow(false)
     val isRemoveAds: Flow<Boolean> get() = _isRemoveAds
 
+    @Keep
     fun getInstance() = this
 
     private val billingService by lazy {
@@ -68,7 +71,7 @@ object PurchaseUtils : PurchaseUpdateListener {
             }
         }
     }
-
+    @Keep
     fun showDialogPayWall(
         context: Activity,
         screenName : String,
@@ -97,6 +100,7 @@ object PurchaseUtils : PurchaseUpdateListener {
         dialog.show()
     }
 
+    @Keep
     fun showBottomSheetPayWall(
         activity: FragmentActivity,
         screenName: String,
@@ -122,18 +126,20 @@ object PurchaseUtils : PurchaseUpdateListener {
         bottomSheet.show(activity.supportFragmentManager, "PremiumBottomSheet")
     }
 
+    @Keep
     fun getPayWall(packageName: String, keyConfig: String): String {
         val url = getTemplateUrlByName(packageName, keyConfig)
         logD("TANHXXXX =>>>>> url:${url}")
         return url
     }
 
-
+    @Keep
     fun addInitBillingFinishListener(listener: () -> Unit) {
         initFinishListener.add(listener)
         if (isAvailable) listener()
     }
 
+    @Keep
     fun buy(
         activity: Activity, id: String,infoScreen: InfoScreen,
         onPurchaseFailure: (code: Int, errorMsg: String?) -> Unit = { _, _ -> },
@@ -164,6 +170,7 @@ object PurchaseUtils : PurchaseUpdateListener {
         billingService.buy(activity, id)
     }
 
+    @Keep
     fun startActivityIAP(
         context: Activity,
         screenName: String,
@@ -185,14 +192,19 @@ object PurchaseUtils : PurchaseUpdateListener {
         )
     }
 
+    @Keep
     fun getPrice(id: String): String = billingService.getPrice(id)
 
+    @Keep
     fun getPriceWithoutCurrency(id: String): Float = billingService.getPriceWithoutCurrency(id)
 
+    @Keep
     fun getCurrency(id: String): String = billingService.getCurrency(id)
 
+    @Keep
     fun getDiscountPrice(id: String): String = billingService.getDiscountPrice(id)
 
+    @Keep
     fun setActionPurchase(actionSuccess: () -> Unit, actionFailed: () -> Unit) {
         if (isRemoveAds()) {
             actionSuccess()
@@ -201,10 +213,13 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
+    @Keep
     fun isRemoveAds() = billingService.isRemoveAds()
 
+    @Keep
     fun checkPurchased() = billingService.checkPurchased()
 
+    @Keep
     fun addSubscriptionAndProduct(
         listSubscriptionId: List<String> = listOf(),
         listOnetimeProductId: List<String> = listOf(),
@@ -217,11 +232,12 @@ object PurchaseUtils : PurchaseUpdateListener {
         )
     }
 
+    @Keep
     fun setListRemoveAdsId(list: List<String>) {
         billingService.setListRemoveAdsId(list)
     }
 
-
+    @Keep
     fun getPayload(): String {
         Log.d(EZT_Purchase, "getPayload: ${billingService.getStandardJsonPayload()}")
         return billingService.getStandardJsonPayload()
@@ -237,22 +253,25 @@ object PurchaseUtils : PurchaseUpdateListener {
         }
     }
 
+    @Keep
     fun setCountryCode(countryCodeX: String) {
         countryCode = countryCodeX
     }
-
+    @Keep
     fun setDarkMode(isDarkModeX: Boolean) {
         isDarkMode = isDarkModeX
     }
-
+    @Keep
     fun setLinkPolicy(url : String){
         privacyPolicy = url
     }
 
+    @Keep
     fun setLinkTerms(url: String){
         termsOfService = url
     }
 
+    @Keep
     fun setTimeOutPayWall(timeOut : Long){
         timeOutPayWall = timeOut
     }

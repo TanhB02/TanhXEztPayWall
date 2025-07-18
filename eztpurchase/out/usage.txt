@@ -128,11 +128,6 @@ com.tanhxpurchase.EztApplication$loadTemplateData$1:
 com.tanhxpurchase.EztApplicationKt
 com.tanhxpurchase.PurchaseUtils$onInitBillingFinish$1:
     public static java.lang.Object invoke()
-com.tanhxpurchase.TrackingUtils:
-    public static void trackingCloseScreen()
-    public static void trackingShowScreen()
-    public static void trackingUpgrade()
-    public static void trackingWatchAds()
 com.tanhxpurchase.activity.IAPWebViewActivity$Companion$start$1:
     public final void onCloseClicked()
     public final void onPurchaseSuccess()

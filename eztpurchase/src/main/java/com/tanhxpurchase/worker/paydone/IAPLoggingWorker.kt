@@ -1,6 +1,7 @@
 package com.tanhxpurchase.worker.paydone
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
@@ -15,6 +16,7 @@ import com.tanhxpurchase.util.logD
 import com.tanhxpurchase.util.logd
 import com.tanhxpurchase.worker.WokerMananer.enqueueDeviceRegistration
 
+@Keep
 class IAPLoggingWorker(
     context: Context,
     params: WorkerParameters

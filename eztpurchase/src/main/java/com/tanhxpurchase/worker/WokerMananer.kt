@@ -1,6 +1,7 @@
 package com.tanhxpurchase.worker
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.Data
@@ -19,6 +20,7 @@ import com.tanhxpurchase.worker.registerdevice.DeviceRegistrationWorker
 import com.tanhxpurchase.worker.trackingevent.TrackingEventWorker
 import java.util.concurrent.TimeUnit
 
+@Keep
 object WokerMananer {
     private const val DEVICE_REGISTRATION_WORK_NAME = "device_registration_work"
     private const val IAP_LOGGING_WORK_NAME = "iap_logging_work"
